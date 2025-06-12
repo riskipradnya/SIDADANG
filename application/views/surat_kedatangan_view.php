@@ -32,13 +32,18 @@
             </div>
 
             <div class="mb-4">
-                <label for="keperluan" class="form-label">2. Pilih Keperluan Surat Pengantar</label>
-                <select class="form-select" id="keperluan" name="keperluan" required>
+                <label for="id_keperluan" class="form-label">2. Pilih Keperluan Surat Pengantar</label>
+                <select class="form-select" id="id_keperluan" name="id_keperluan" required>
                     <option value="" selected disabled>--- Pilih Keperluan ---</option>
-                    <option value="domisili">Surat Keterangan Domisili</option>
-                    <option value="kerja">Surat Pengantar Kerja</option>
-                    <option value="usaha">Surat Keterangan Usaha</option>
-                    <option value="lainnya">Lainnya</option>
+                    
+                    <?php if (isset($list_keperluan) && !empty($list_keperluan)): ?>
+                        <?php foreach ($list_keperluan as $keperluan): ?>
+                            <option value="<?= htmlspecialchars($keperluan->id); ?>" data-nama="<?= strtolower(str_replace(' ', '', $keperluan->nama_keperluan)); ?>">
+                                <?= htmlspecialchars($keperluan->nama_keperluan); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+
                 </select>
             </div>
             
@@ -87,23 +92,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Ambil elemen-elemen yang dibutuhkan dari DOM
-    const keperluanSelect = document.getElementById('keperluan');
+    const keperluanSelect = document.getElementById('id_keperluan'); // Ganti ID
     const lainnyaDiv = document.getElementById('keperluan_lainnya_div');
     const lainnyaInput = document.getElementById('keperluan_lainnya_text');
 
-    // Tampilkan/sembunyikan input "Lainnya" berdasarkan pilihan dropdown
-    if (keperluanSelect) {
-        keperluanSelect.addEventListener('change', function() {
-            if (this.value === 'lainnya') {
-                lainnyaDiv.style.display = 'block'; // Tampilkan input teks
-                lainnyaInput.required = true;       // Jadikan wajib diisi
-            } else {
-                lainnyaDiv.style.display = 'none';  // Sembunyikan input teks
-                lainnyaInput.required = false;      // Jadikan tidak wajib diisi
-                lainnyaInput.value = '';            // Kosongkan nilainya
-            }
-        });
-    }
+    keperluanSelect.addEventListener('change', function() {
+        // Ambil data-nama dari option yang dipilih
+        const selectedOptionName = this.options[this.selectedIndex].getAttribute('data-nama');
+        
+        if (selectedOptionName === 'lainnya') { // Cek berdasarkan data-nama
+            lainnyaDiv.style.display = 'block';
+            lainnyaInput.required = true;
+        } else {
+            lainnyaDiv.style.display = 'none';
+            lainnyaInput.required = false;
+        }
+    });
 
 });
 </script>

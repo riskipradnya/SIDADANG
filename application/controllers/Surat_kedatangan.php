@@ -21,19 +21,29 @@ class Surat_kedatangan extends CI_Controller {
     /**
      * Menampilkan halaman daftar pendatang yang siap cetak surat.
      */
+    // application/controllers/Surat_kedatangan.php
+
     public function index()
     {
-        // === Query Database Langsung di Controller ===
+        // 1. Query untuk mengambil data pendatang (ini sudah ada)
         $this->db->from('tbpendatang');
         $this->db->where('statusAktivasi', 'Terverifikasi');
         $this->db->order_by('nama', 'ASC'); 
-        $query = $this->db->get();
-        $data['pendatang_terverifikasi'] = $query->result();
-        // ===========================================
+        $query_pendatang = $this->db->get();
+        $data['pendatang_terverifikasi'] = $query_pendatang->result();
 
-        // Memuat view dan mengirimkan data
+        // ==========================================================
+        // 2. TAMBAHKAN QUERY BARU INI untuk mengambil data keperluan
+        // ==========================================================
+        $this->db->from('tbkeperluansurat');
+        $this->db->where('is_active', 1); // Hanya ambil yang aktif
+        $this->db->order_by('nama_keperluan', 'ASC');
+        $query_keperluan = $this->db->get();
+        $data['list_keperluan'] = $query_keperluan->result();
+        // ==========================================================
+
+        // Memuat view dan mengirimkan SEMUA data
         $template_data['konten'] = $this->load->view('surat_kedatangan_view', $data, TRUE);
-        $template_data['title']  = 'Cetak Surat Kedatangan'; // Opsional, jika template Anda menggunakan title
         $this->load->view('admin_view', $template_data);
     }
 }

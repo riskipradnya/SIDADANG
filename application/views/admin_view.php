@@ -213,7 +213,7 @@
 
             <li class="nav-item">
               <a class="nav-link" href="<?= site_url('surat_kedatangan'); ?>">
-                <i class="menu-icon mdi mdi-printer"></i>
+                <i class="menu-icon mdi mdi-file-document-multiple-outline"></i>
                 <span class="menu-title">Surat Pengantar</span>
               </a>
             </li>

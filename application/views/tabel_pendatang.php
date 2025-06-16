@@ -37,39 +37,45 @@
                                 <td class="text-center">
                                     <?php
                                         $status = $pengajuan->status;
-                                        $badge_class = 'bg-secondary';
-                                        if ($status == 'Menunggu Verifikasi') $badge_class = 'bg-warning text-dark';
-                                        if ($status == 'Terverifikasi') $badge_class = 'bg-success';
-                                        if ($status == 'Ditolak') $badge_class = 'bg-danger';
+                                        if ($status == 'Terverifikasi') {
+                                            echo "<span class='status-badge status-terverifikasi'>" . htmlspecialchars($status) . "</span>";
+                                        } elseif ($status == 'Menunggu Verifikasi') {
+                                            echo "<span class='status-badge status-menunggu'>" . htmlspecialchars($status) . "</span>";
+                                        } elseif ($status == 'Ditolak') {
+                                            echo "<span class='status-badge status-ditolak'>" . htmlspecialchars($status) . "</span>";
+                                        } else { // Fallback untuk status lain jika ada
+                                            echo "<span class='status-badge status-secondary'>" . htmlspecialchars($status) . "</span>";
+                                        }
                                     ?>
-                                    <span class="badge <?= $badge_class; ?>"><?= htmlspecialchars($status); ?></span>
                                 </td>
                                 <td class="text-center">
-                                    <?php
-                                        // Aksi yang hanya bisa dilakukan jika status masih 'Menunggu Verifikasi'
-                                        if ($pengajuan->status == 'Menunggu Verifikasi'):
-                                    ?>
-                                        <a href="<?= site_url('surat_kedatangan/verifikasi_pengajuan/' . $pengajuan->id); ?>" 
-                                        class="btn btn-sm btn-success" 
-                                        title="Verifikasi" 
-                                        onclick="return confirm('Anda yakin ingin MEMVERIFIKASI pengajuan ini?');">
-                                        <i class="mdi mdi-check-circle"></i>
-                                        </a>
+                                    <div class="btn-group btn-group-sm btn-group-aksi-responsive" role="group" aria-label="Aksi Pengajuan">
+                                        <?php
+                                            // Aksi yang hanya bisa dilakukan jika status masih 'Menunggu Verifikasi'
+                                            if ($pengajuan->status == 'Menunggu Verifikasi'):
+                                        ?>
+                                            <a href="<?= site_url('surat_kedatangan/verifikasi_pengajuan/' . $pengajuan->id); ?>" 
+                                            class="btn btn-outline-success" 
+                                            title="Verifikasi" 
+                                            onclick="return confirm('Anda yakin ingin MEMVERIFIKASI pengajuan ini?');">
+                                            <i class="mdi mdi-check-circle-outline"></i>
+                                            </a>
 
-                                        <a href="javascript:void(0);" 
-                                        class="btn btn-sm btn-danger" 
-                                        title="Tolak" 
-                                        onclick="tolakPengajuan(<?= $pengajuan->id; ?>);">
-                                        <i class="mdi mdi-close-circle"></i>
+                                            <a href="javascript:void(0);" 
+                                            class="btn btn-outline-warning" 
+                                            title="Tolak" 
+                                            onclick="tolakPengajuan(<?= $pengajuan->id; ?>);">
+                                            <i class="mdi mdi-close-circle-outline"></i>
+                                            </a>
+                                        <?php endif; ?>
+                                        
+                                        <a href="<?= site_url('surat_kedatangan/hapus_pengajuan/' . $pengajuan->id); ?>" 
+                                        class="btn btn-outline-danger" 
+                                        title="Hapus Data" 
+                                        onclick="return confirm('PERINGATAN! Anda yakin ingin MENGHAPUS data ini secara permanen? Aksi ini tidak bisa dibatalkan.');">
+                                        <i class="mdi mdi-delete-outline"></i>
                                         </a>
-                                    <?php endif; ?>
-
-                                    <a href="<?= site_url('surat_kedatangan/hapus_pengajuan/' . $pengajuan->id); ?>" 
-                                    class="btn btn-sm btn-dark" 
-                                    title="Hapus Data" 
-                                    onclick="return confirm('PERINGATAN! Anda yakin ingin MENGHAPUS data ini secara permanen? Aksi ini tidak bisa dibatalkan.');">
-                                    <i class="mdi mdi-delete-forever"></i>
-                                    </a>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

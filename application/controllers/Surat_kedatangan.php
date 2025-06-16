@@ -16,15 +16,24 @@ class Surat_kedatangan extends CI_Controller {
 
     public function index()
     {
-        // Fungsi index() Anda sudah benar, tidak perlu diubah.
-        // Cukup pastikan tidak ada error di dalamnya.
+        // 1. Siapkan data untuk FORM
         $data_form['pendatang_terverifikasi'] = $this->db->where('statusAktivasi', 'Terverifikasi')->order_by('nama', 'ASC')->get('tbpendatang')->result();
         $data_form['list_keperluan'] = $this->db->where('is_active', 1)->order_by('nama_keperluan', 'ASC')->get('tbkeperluansurat')->result();
-        $data_tabel['list_pengajuan'] = $this->surat_model->get_all_pengajuan();
-        
         $template_data['konten'] = $this->load->view('surat_kedatangan_view', $data_form, TRUE);
-        $template_data['table'] = $this->load->view('pengajuan_table', $data_tabel, TRUE);
+
+        // 2. Siapkan data & view untuk TABEL SEMUA PENGAJUAN
+        $data_tabel_semua['list_pengajuan'] = $this->surat_model->get_all_pengajuan();
+        $view_tabel_semua = $this->load->view('pengajuan_table', $data_tabel_semua, TRUE);
         
+        // 3. Siapkan data & view untuk TABEL TERVERIFIKASI
+        // Pastikan fungsi get_verified_pengajuan() ada di model Anda
+        $data_tabel_terverifikasi['list_pengajuan'] = $this->surat_model->get_verified_pengajuan(); 
+        $view_tabel_terverifikasi = $this->load->view('terverifikasi_table', $data_tabel_terverifikasi, TRUE);
+        
+        // 4. GABUNGKAN kedua view tabel menjadi satu string HTML
+        $template_data['table'] = $view_tabel_semua . $view_tabel_terverifikasi;
+        
+        // 5. Muat layout utama dengan semua data yang sudah dirakit
         $this->load->view('admin_view', $template_data);
     }
 

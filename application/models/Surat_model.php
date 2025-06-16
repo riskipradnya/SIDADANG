@@ -28,10 +28,32 @@ class Surat_model extends CI_Model {
         // Gabungkan (JOIN) dengan tabel tbkeperluansurat
         // ASUMSI: Anda punya tabel 'tbkeperluansurat' dengan kolom 'id' dan 'nama_keperluan'
         $this->db->join('tbkeperluansurat as kp', 'ps.id_keperluan = kp.id', 'left');
+
+        $this->db->where_in('ps.status', ['Menunggu Verifikasi', 'Ditolak']);
         
         $this->db->order_by('ps.tanggal_pengajuan', 'DESC'); // Urutkan berdasarkan tanggal terbaru
 
         $query = $this->db->get();
         return $query->result(); // Kembalikan hasil sebagai array of objects
+    }
+
+    public function get_verified_pengajuan()
+    {
+        // Query-nya sama persis dengan get_all_pengajuan()
+        $this->db->select(
+            'ps.*, p.nama as nama_pendatang, p.nik as nik_pendatang, kp.nama_keperluan'
+        );
+        $this->db->from('tbpengajuansurat as ps');
+        $this->db->join('tbpendatang as p', 'ps.id_pendatang = p.id', 'left');
+        $this->db->join('tbkeperluansurat as kp', 'ps.id_keperluan = kp.id', 'left');
+        
+        // --- INI PERBEDAANNYA ---
+        // Tambahkan filter untuk status
+        $this->db->where('ps.status', 'Terverifikasi');
+        
+        $this->db->order_by('ps.tanggal_verifikasi', 'DESC'); // Urutkan berdasarkan tanggal verifikasi terbaru
+
+        $query = $this->db->get();
+        return $query->result();
     }
 }

@@ -55,7 +55,7 @@
 
 <div class="card shadow-sm mt-4">
     <div class="card-header card-header-minimalist">
-        Tabel Pengajuan Surat Pengantar
+        Pengajuan Surat Pengantar
     </div>
     <div class="card-body">
         <div class="table-responsive">

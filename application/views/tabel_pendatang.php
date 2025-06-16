@@ -1,3 +1,58 @@
+<style>
+    /* =================================================================
+       SOLUSI BARU & LEBIH SPESIFIK UNTUK HEADER SIMPLE-DATATABLE
+       ================================================================= */
+    /* Targetkan LANGSUNG link (<a>) di dalam header tabel */
+    #datatablePengajuan thead th a {
+        color: #212529 !important; /* Warna teks hitam standar */
+        text-decoration: none !important; /* Hapus garis bawah */
+    }
+
+    /* Targetkan ikon panah sort agar warnanya juga tidak biru */
+    #datatablePengajuan .dataTable-sorter::after,
+    #datatablePengajuan .dataTable-sorter::before {
+        opacity: 0.5 !important; /* Buat panah sedikit transparan agar tidak mencolok */
+    }
+
+
+    /* =================================================================
+       CSS LAMA ANDA (TETAP DIPAKAI)
+       ================================================================= */
+    /* CSS untuk STATUS BADGE dengan border dan background transparan */
+    .status-badge {
+        display: inline-block;
+        padding: 0.30em 0.60em;
+        font-size: 0.875em;
+        font-weight: 600;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 3px !important;
+        border: 1px solid transparent;
+    }
+
+    .status-terverifikasi { color: #198754; border-color: #198754; background-color: transparent; }
+    .status-menunggu { color: #ffc107; border-color: #ffc107; background-color: transparent; }
+    .status-ditolak { color: #dc3545; border-color: #dc3545; background-color: transparent; }
+    .status-secondary { color: #6c757d; border-color: #6c757d; background-color: transparent; }
+
+    /* CSS untuk membuat grup tombol aksi menjadi responsif */
+    @media (max-width: 767.98px) {
+        .btn-group-aksi-responsive {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch; 
+        }
+        .btn-group-aksi-responsive .btn,
+        .btn-group-aksi-responsive button.btn {
+            width: 100%;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+    }
+</style>
+
 <div class="card shadow-sm mt-4">
     <div class="card-header card-header-minimalist">
         Tabel Pengajuan Surat Pengantar

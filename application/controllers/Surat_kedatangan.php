@@ -23,36 +23,57 @@ class Surat_kedatangan extends CI_Controller {
         $data_tabel['list_pengajuan'] = $this->surat_model->get_all_pengajuan();
         
         $template_data['konten'] = $this->load->view('surat_kedatangan_view', $data_form, TRUE);
-        $template_data['table'] = $this->load->view('tabel_pendatang', $data_tabel, TRUE);
+        $template_data['table'] = $this->load->view('pengajuan_table', $data_tabel, TRUE);
         
         $this->load->view('admin_view', $template_data);
     }
 
     public function proses_pengajuan()
     {
-        // Tidak perlu ada perubahan di sini, kode ini sudah benar.
         $this->form_validation->set_rules('id_pendatang', 'Pendatang', 'required|numeric');
         $this->form_validation->set_rules('id_keperluan', 'Keperluan', 'required|numeric');
 
         if ($this->form_validation->run() == FALSE) {
-            $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Gagal mengajukan surat. Pastikan semua data yang wajib diisi sudah dipilih.</div>');
+            $this->session->set_flashdata('pesan', 'Gagal mengajukan surat. Pastikan semua data yang wajib diisi sudah dipilih.');
         } else {
+            // --- AWAL KODE BARU UNTUK NOMOR SURAT ---
+
+            // 1. Ambil ID Pendatang dari form
+            $id_pendatang = $this->input->post('id_pendatang');
+
+            // 2. Buat semua komponen nomor surat sesuai pola
+            $nomor_urut  = str_pad($id_pendatang, 3, '0', STR_PAD_LEFT); // Format ID jadi 3 digit, misal: 7 -> "007"
+            $kode_statis = "SKSD/JB";
+            $tanggal     = date('d'); // Format DD, misal: "17"
+            $bulan       = date('m');   // Format MM, misal: "06"
+            $tahun       = date('y');   // Format YY, misal: "25"
+
+            // 3. Gabungkan semua komponen menjadi satu
+            $nomor_surat_final = "{$nomor_urut}/{$kode_statis}/{$tanggal}/{$bulan}/{$tahun}";
+            // Contoh hasil: "007/SKSD/JB/17/06/25"
+
+            // --- AKHIR KODE BARU ---
+
+            // Siapkan data untuk disimpan, SEKARANG TERMASUK nomor_surat
             $data_to_insert = [
-                'id_pendatang'          => $this->input->post('id_pendatang'),
-                'id_keperluan'          => $this->input->post('id_keperluan'),
-                'keperluan_lainnya_text'=> $this->input->post('keperluan_lainnya_text'),
-                'tanggal_pengajuan'     => date('Y-m-d H:i:s'),
-                'status'                => 'Menunggu Verifikasi'
+                'id_pendatang'           => $id_pendatang,
+                'id_keperluan'           => $this->input->post('id_keperluan'),
+                'keperluan_lainnya_text' => $this->input->post('keperluan_lainnya_text'),
+                'nomor_surat'            => $nomor_surat_final, // <-- NOMOR SURAT DISIMPAN
+                'tanggal_pengajuan'      => date('Y-m-d H:i:s'),
+                'status'                 => 'Menunggu Verifikasi'
             ];
+
             $insert = $this->db->insert('tbpengajuansurat', $data_to_insert);
+            
             if ($insert) {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Berhasil mengajukan surat pengantar! Data baru telah ditambahkan ke tabel.</div>');
+                $this->session->set_flashdata('pesan', 'Berhasil mengajukan surat pengantar!');
             } else {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Terjadi kesalahan saat menyimpan data ke database.</div>');
+                $this->session->set_flashdata('pesan', 'Terjadi kesalahan saat menyimpan data ke database.');
             }
         }
         
-        // 2. PASTIKAN BARIS INI DIEKSEKUSI
+        // Kembalikan pengguna ke halaman tabel
         redirect('surat_kedatangan', 'refresh');
     }
 

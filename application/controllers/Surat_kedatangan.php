@@ -7,72 +7,112 @@ class Surat_kedatangan extends CI_Controller {
     {
         parent::__construct();
         $this->load->database();
-        $this->load->library(['session', 'form_validation']); // Tambahkan form_validation
-        $this->load->helper('url');
+        
+        // 1. PASTIKAN SEMUA YANG DIBUTUHKAN SUDAH DI-LOAD DI SINI
+        $this->load->helper('url'); 
+        $this->load->library(['session', 'form_validation']);
         $this->load->model('surat_model'); 
     }
 
     public function index()
     {
-        // ... (fungsi index Anda yang sudah ada, tidak perlu diubah) ...
-
-        // Menyiapkan data untuk form
+        // Fungsi index() Anda sudah benar, tidak perlu diubah.
+        // Cukup pastikan tidak ada error di dalamnya.
         $data_form['pendatang_terverifikasi'] = $this->db->where('statusAktivasi', 'Terverifikasi')->order_by('nama', 'ASC')->get('tbpendatang')->result();
         $data_form['list_keperluan'] = $this->db->where('is_active', 1)->order_by('nama_keperluan', 'ASC')->get('tbkeperluansurat')->result();
-        
-        // Menyiapkan data untuk tabel
         $data_tabel['list_pengajuan'] = $this->surat_model->get_all_pengajuan();
         
-        // Menyiapkan pesan dari proses pengajuan (jika ada)
-        $data_form['pesan'] = $this->session->flashdata('pesan');
-        
-        // Merakit View
         $template_data['konten'] = $this->load->view('surat_kedatangan_view', $data_form, TRUE);
         $template_data['table'] = $this->load->view('tabel_pendatang', $data_tabel, TRUE);
         
         $this->load->view('admin_view', $template_data);
     }
 
-
-    /**
-     * ===============================================================
-     * INI FUNGSI BARU UNTUK MEMPROSES DATA DARI FORM (MENGHILANGKAN 404)
-     * ===============================================================
-     */
     public function proses_pengajuan()
     {
-        // 1. Atur aturan validasi
+        // Tidak perlu ada perubahan di sini, kode ini sudah benar.
         $this->form_validation->set_rules('id_pendatang', 'Pendatang', 'required|numeric');
         $this->form_validation->set_rules('id_keperluan', 'Keperluan', 'required|numeric');
-        // 'keperluan_lainnya_text' tidak wajib, jadi tidak perlu divalidasi 'required'
 
-        // 2. Jalankan validasi
         if ($this->form_validation->run() == FALSE) {
-            // Jika validasi gagal, kembalikan ke halaman form dengan pesan error
             $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Gagal mengajukan surat. Pastikan semua data yang wajib diisi sudah dipilih.</div>');
-            redirect('surat_kedatangan');
         } else {
-            // Jika validasi berhasil, lanjutkan proses
-            // 3. Siapkan data untuk dimasukkan ke database
             $data_to_insert = [
                 'id_pendatang'          => $this->input->post('id_pendatang'),
                 'id_keperluan'          => $this->input->post('id_keperluan'),
                 'keperluan_lainnya_text'=> $this->input->post('keperluan_lainnya_text'),
-                'tanggal_pengajuan'     => date('Y-m-d H:i:s'), // Waktu saat ini
-                'status'                => 'Menunggu Verifikasi' // Status default
+                'tanggal_pengajuan'     => date('Y-m-d H:i:s'),
+                'status'                => 'Menunggu Verifikasi'
             ];
-
-            // 4. Masukkan data ke tabel 'tbpengajuansurat'
             $insert = $this->db->insert('tbpengajuansurat', $data_to_insert);
-
-            // 5. Beri pesan feedback dan kembalikan ke halaman utama
             if ($insert) {
-                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Berhasil mengajukan surat pengantar! Silakan tunggu proses verifikasi.</div>');
+                $this->session->set_flashdata('pesan', '<div class="alert alert-success">Berhasil mengajukan surat pengantar! Data baru telah ditambahkan ke tabel.</div>');
             } else {
                 $this->session->set_flashdata('pesan', '<div class="alert alert-danger">Terjadi kesalahan saat menyimpan data ke database.</div>');
             }
-
-            redirect('surat_kedatangan');
         }
+        
+        // 2. PASTIKAN BARIS INI DIEKSEKUSI
+        redirect('surat_kedatangan', 'refresh');
+    }
+
+    public function verifikasi_pengajuan($id)
+    {
+        // Ambil ID admin yang sedang login dari session
+        // GANTI 'kodeDaftar' jika key session Anda berbeda
+        $id_verifikator = $this->session->userdata('kodeDaftar');
+
+        $data_update = [
+            'status'             => 'Terverifikasi',
+            'tanggal_verifikasi' => date('Y-m-d H:i:s'),
+            'id_verifikator'     => $id_verifikator
+        ];
+
+        $this->db->where('id', $id);
+        $this->db->update('tbpengajuansurat', $data_update);
+
+        $this->session->set_flashdata('pesan', '<div class="alert alert-success">Satu pengajuan berhasil diverifikasi!</div>');
+        redirect('surat_kedatangan', 'refresh');
+    }
+
+    /**
+     * Fungsi untuk menolak pengajuan.
+     * Dipanggil dari tombol Tolak di tabel.
+     */
+    public function tolak_pengajuan($id)
+    {
+        // Ambil alasan penolakan dari parameter GET di URL
+        $alasan = $this->input->get('alasan');
+
+        // Ambil ID admin yang sedang login dari session
+        // GANTI 'kodeDaftar' jika key session Anda berbeda
+        $id_verifikator = $this->session->userdata('kodeDaftar');
+
+        $data_update = [
+            'status'              => 'Ditolak',
+            'tanggal_verifikasi'  => date('Y-m-d H:i:s'),
+            'id_verifikator'      => $id_verifikator,
+            'catatan_penolakan'   => $alasan // Simpan alasan penolakan
+        ];
+
+        $this->db->where('id', $id);
+        $this->db->update('tbpengajuansurat', $data_update);
+
+        $this->session->set_flashdata('pesan', '<div class="alert alert-warning">Satu pengajuan telah ditolak.</div>');
+        redirect('surat_kedatangan', 'refresh');
+    }
+
+    public function hapus_pengajuan($id)
+    {
+        // Perintah untuk menghapus baris dari tabel 'tbpengajuansurat'
+        // di mana kolom 'id' cocok dengan $id yang dikirim dari URL.
+        $this->db->where('id', $id);
+        $this->db->delete('tbpengajuansurat');
+
+        // Buat pesan feedback untuk ditampilkan ke pengguna
+        $this->session->set_flashdata('pesan', '<div class="alert alert-success">Data pengajuan berhasil dihapus secara permanen.</div>');
+        
+        // Kembalikan pengguna ke halaman tabel
+        redirect('surat_kedatangan', 'refresh');
     }
 }

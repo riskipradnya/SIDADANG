@@ -2,6 +2,12 @@
     <div class="card-header card-header-minimalist"> Formulir Pengajuan Surat Pengantar
     </div>
 
+        <?php
+        // Bisa juga langsung dari session
+        if ($this->session->flashdata('pesan')) {
+            echo $this->session->flashdata('pesan');
+        }
+        ?>
     
     <div class="card-body">
 
@@ -12,7 +18,8 @@
         }
         ?>
 
-        <form action="<?= site_url('surat_kedatangan/proses_pengajuan'); ?>" method="POST" target="_blank" id="formPengajuanSurat">
+
+        <form action="<?= site_url('surat_kedatangan/proses_pengajuan'); ?>" method="POST" id="formPengajuanSurat">
 
             <div class="mb-4">
                 <label for="id_pendatang" class="form-label">1. Pilih Pendatang (Terverifikasi)</label>

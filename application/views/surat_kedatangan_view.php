@@ -3,10 +3,25 @@
     </div>
 
         <?php
-        // Bisa juga langsung dari session
-        if ($this->session->flashdata('pesan')) {
-            echo $this->session->flashdata('pesan');
-        }
+            // Ambil flashdata dari session
+            $pesan_sukses = $this->session->flashdata('pesan');
+            $pesan_error = $this->session->flashdata('error');
+            
+            // Tampilkan pesan sukses jika ada
+            if (!empty($pesan_sukses)) {
+                echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
+                        ' . $pesan_sukses . '
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>';
+            }
+
+            // Tampilkan pesan error jika ada (untuk jaga-jaga ke depan)
+            if (!empty($pesan_error)) {
+                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        ' . $pesan_error . '
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>';
+            }
         ?>
     
     <div class="card-body">

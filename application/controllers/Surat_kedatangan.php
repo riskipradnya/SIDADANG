@@ -71,7 +71,7 @@ class Surat_kedatangan extends CI_Controller {
         $this->db->where('id', $id);
         $this->db->update('tbpengajuansurat', $data_update);
 
-        $this->session->set_flashdata('pesan', '<div class="alert alert-success">Satu pengajuan berhasil diverifikasi!</div>');
+        $this->session->set_flashdata('pesan', 'Satu pengajuan berhasil diverifikasi!');
         redirect('surat_kedatangan', 'refresh');
     }
 
@@ -98,7 +98,7 @@ class Surat_kedatangan extends CI_Controller {
         $this->db->where('id', $id);
         $this->db->update('tbpengajuansurat', $data_update);
 
-        $this->session->set_flashdata('pesan', '<div class="alert alert-warning">Satu pengajuan telah ditolak.</div>');
+        $this->session->set_flashdata('pesan', 'Satu pengajuan telah ditolak.');
         redirect('surat_kedatangan', 'refresh');
     }
 
@@ -110,7 +110,7 @@ class Surat_kedatangan extends CI_Controller {
         $this->db->delete('tbpengajuansurat');
 
         // Buat pesan feedback untuk ditampilkan ke pengguna
-        $this->session->set_flashdata('pesan', '<div class="alert alert-success">Data pengajuan berhasil dihapus secara permanen.</div>');
+        $this->session->set_flashdata('pesan', 'Data pengajuan berhasil dihapus secara permanen.');
         
         // Kembalikan pengguna ke halaman tabel
         redirect('surat_kedatangan', 'refresh');

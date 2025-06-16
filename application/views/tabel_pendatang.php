@@ -59,7 +59,7 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-striped table-hover" id="datatablePengajuan">
+            <table class="table table-hover" id="datatablePengajuan">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -79,7 +79,7 @@
                                 <td><?= $no++; ?></td>
                                 <td><?= htmlspecialchars($pengajuan->nomor_surat ?? '-'); ?></td>
                                 <td>
-                                    <strong><?= htmlspecialchars($pengajuan->nama_pendatang); ?></strong><br>
+                                    <?= htmlspecialchars($pengajuan->nama_pendatang); ?><br>
                                     <small class="text-muted">NIK: <?= htmlspecialchars($pengajuan->nik_pendatang); ?></small>
                                 </td>
                                 <td>

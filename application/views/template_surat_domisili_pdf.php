@@ -136,7 +136,7 @@
                 <tr>
                     <td class="label">Nama Lengkap</td>
                     <td class="separator">:</td>
-                    <td class="value text-bold"><?= htmlspecialchars($pendatang->nama); ?></td>
+                    <td class="value"><?= htmlspecialchars($pendatang->nama); ?></td>
                 </tr>
                 <tr>
                     <td class="label">NIK</td>

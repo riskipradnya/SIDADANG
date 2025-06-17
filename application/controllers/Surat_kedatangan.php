@@ -145,4 +145,103 @@ class Surat_kedatangan extends CI_Controller {
         // Kembalikan pengguna ke halaman tabel
         redirect('surat_kedatangan', 'refresh');
     }
+
+        private function _tgl_indonesia($tanggal)
+    {
+        if(empty($tanggal) || $tanggal == '0000-00-00') {
+            return '-';
+        }
+        $bulan = array (
+            1 => 'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember'
+        );
+        $pecahkan = explode('-', $tanggal);
+        // Format: tanggal bulan tahun, contoh: 17 Juni 2025
+        return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
+    }
+
+        public function cetak_surat($id_pengajuan = NULL)
+    {
+        // 1. Validasi Input ID
+        if ($id_pengajuan === NULL || !is_numeric($id_pengajuan) || (int)$id_pengajuan <= 0) {
+            $this->session->set_flashdata('pesan', 'Permintaan tidak valid untuk mencetak surat.');
+            redirect('surat_kedatangan');
+            return;
+        }
+
+        // 2. Query untuk mengambil data gabungan
+        $this->db->select('
+            ps.*, 
+            p.*,  
+            pj.namaLengkap as pj_namaLengkap
+        ');
+        $this->db->from('tbpengajuansurat ps');
+        $this->db->join('tbpendatang p', 'ps.id_pendatang = p.id', 'inner');
+        $this->db->join('tbpj pj', 'p.id_penanggung_jawab = pj.kodeDaftar', 'left');
+        $this->db->where('ps.id', (int)$id_pengajuan);
+        $pengajuan = $this->db->get()->row();
+
+        // 3. Cek apakah data pengajuan ditemukan
+        if (!$pengajuan) {
+            $this->session->set_flashdata('pesan', 'Data pengajuan surat tidak ditemukan.');
+            redirect('surat_kedatangan');
+            return;
+        }
+
+        // 4. Cek Status, hanya yang 'Terverifikasi' boleh dicetak
+        if ($pengajuan->status !== 'Terverifikasi') {
+            $this->session->set_flashdata('pesan', 'Surat hanya dapat dicetak untuk pengajuan yang sudah terverifikasi.');
+            redirect('surat_kedatangan');
+            return;
+        }
+
+        // 5. Format data tanggal lahir pendatang
+        $tgl_lahir_pendatang_formatted = !empty($pengajuan->tgl_lahir) && $pengajuan->tgl_lahir != '0000-00-00' 
+            ? $this->_tgl_indonesia($pengajuan->tgl_lahir)
+            : '-';
+
+        // 6. Siapkan semua data yang akan dikirim ke view PDF
+        $data_surat = [
+            'pendatang'             => $pengajuan, // Objek ini sekarang berisi data dari tbpendatang & tbpengajuansurat
+            'tgl_lahir_pendatang'   => $tgl_lahir_pendatang_formatted,
+            'nomor_surat'           => $pengajuan->nomor_surat, // Ambil nomor surat dari DB
+            'tanggal_surat'         => $this->_tgl_indonesia(date('Y-m-d')),
+            'pj_nama'               => !empty($pengajuan->pj_namaLengkap) ? $pengajuan->pj_namaLengkap : '',
+            'nama_pejabat'          => '(Wayan Kardiyasa, S.Pd)', // GANTI DENGAN NAMA PERBEKEL
+            'nip_pejabat'           => '(NIP PERBEKEL JIKA ADA)',   // GANTI DENGAN NIP ATAU KOSONGKAN
+            'jabatan_pejabat'       => 'Perbekel Desa Jimbaran',
+            'keperluan_surat'       => 'kelengkapan dokumen administrasi internal'
+        ];
+
+        // 7. Proses pembuatan PDF dengan Dompdf (kode dari contoh Anda)
+        $html = $this->load->view('template_surat_domisili_pdf', $data_surat, TRUE);
+
+        require_once APPPATH . 'libraries/dompdf/autoload.inc.php';
+        
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', TRUE);
+        $options->setChroot(FCPATH); 
+        
+        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        
+        // Buat nama file yang unik
+        $filename = "Surat_Domisili_" . str_replace(' ', '_', $pengajuan->nama) . "_" . $pengajuan->nik . ".pdf";
+        
+        // Tampilkan PDF di browser (inline)
+        $dompdf->stream($filename, ["Attachment" => 0]); 
+        exit();
+    }
 }

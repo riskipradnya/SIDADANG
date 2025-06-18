@@ -125,7 +125,7 @@
         </div>
     </div>
 
-    <div class="judul-surat">SURAT KETERANGAN DOMISILI</div>
+    <div class="judul-surat">SURAT PENGANTAR</div>
     <div class="nomor-surat">Nomer: <?= htmlspecialchars($nomor_surat); ?></div>
 
     <div class="isi-surat">
@@ -171,7 +171,11 @@
             </table>
         </div>
 
-        <p class="paragraf" style="text-indent: 2.5em;">Adalah warga yang berdomisili di wilayah kami, <?= !empty($pendatang->id_penanggung_jawab) && !empty($pj_nama) ? 'kontrak/kost tinggal di rumah Bapak/Ibu ' . htmlspecialchars($pj_nama) : 'dan saat ini berdomisili'; ?>, beralamat di <?= nl2br(htmlspecialchars($pendatang->alamat_sekarang)); ?> Lingkungan <?= htmlspecialchars($pendatang->wilayah); ?>, Desa Jimbaran, Kecamatan Kuta Selatan, Kabupaten Badung.</p>
+        <p class="paragraf" style="text-indent: 2.5em;">Adalah warga yang berdomisili di wilayah kami<?php 
+        // Jika ada penanggung jawab, cetak informasinya, termasuk koma di depannya.
+        if (!empty($pendatang->id_penanggung_jawab) && !empty($pj_nama)) {
+            echo ', kontrak/kost tinggal di rumah Bapak/Ibu ' . htmlspecialchars($pj_nama);
+        }?>. Adapun Surat Pengantar ini dibuat untuk keperluan … .</p>
         
         <p class="paragraf">Demikian surat keterangan domisili ini dibuat dengan sebenar-benarnya untuk dapat digunakan sebagaimana mestinya.</p>
     </div>

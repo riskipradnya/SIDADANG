@@ -175,7 +175,9 @@
         // Jika ada penanggung jawab, cetak informasinya, termasuk koma di depannya.
         if (!empty($pendatang->id_penanggung_jawab) && !empty($pj_nama)) {
             echo ', kontrak/kost tinggal di rumah Bapak/Ibu ' . htmlspecialchars($pj_nama);
-        }?>. Adapun Surat Pengantar ini dibuat untuk keperluan … .</p>
+        }
+        // Tanda titik (.) di bawah ini memisahkan kalimat.
+        ?>. Adapun surat keterangan ini dibuat untuk keperluan <?= htmlspecialchars(strtolower($keperluan_surat)); ?>.</p>
         
         <p class="paragraf">Demikian surat keterangan domisili ini dibuat dengan sebenar-benarnya untuk dapat digunakan sebagaimana mestinya.</p>
     </div>

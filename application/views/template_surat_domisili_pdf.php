@@ -163,10 +163,11 @@
                     <td class="separator">:</td>
                     <td class="value"><?= nl2br(htmlspecialchars($pendatang->alamat_asal)); ?>, RT/RW <?= htmlspecialchars($pendatang->rt); ?>/<?= htmlspecialchars($pendatang->rw); ?>, Kel/Desa <?= htmlspecialchars($pendatang->kelurahan_asal); ?>, Kec. <?= htmlspecialchars($pendatang->kecamatan_asal); ?>, <?= htmlspecialchars($pendatang->kabupaten_asal); ?>, Prov. <?= htmlspecialchars($pendatang->provinsi_asal); ?></td>
                 </tr>
-                 <tr>
-                    <td class="label">No. Handphone</td>
+
+                <tr>
+                    <td class="label">Alamat Sekarang</td>
                     <td class="separator">:</td>
-                    <td class="value"><?= htmlspecialchars($pendatang->no_hp); ?></td>
+                    <td class="value"><?= nl2br(htmlspecialchars($pendatang->alamat_sekarang)); ?></td>
                 </tr>
             </table>
         </div>

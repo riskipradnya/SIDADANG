@@ -122,6 +122,48 @@ class Surat_kedatangan extends CI_Controller {
     }
 
     /**
+     * Fungsi untuk menangani penambahan tipe keperluan baru dari form modal.
+     */
+    public function tambah_keperluan()
+    {
+        // Atur aturan validasi
+        // 'required' -> tidak boleh kosong
+        // 'trim' -> hapus spasi di awal dan akhir
+        // 'is_unique' -> pastikan nama keperluan belum ada di database
+        $this->form_validation->set_rules(
+            'nama_keperluan', 
+            'Nama Keperluan', 
+            'required|trim|is_unique[tbkeperluansurat.nama_keperluan]',
+            [
+                'is_unique' => 'Nama keperluan ini sudah ada di dalam sistem.'
+            ]
+        );
+
+        if ($this->form_validation->run() == FALSE) {
+            // Jika validasi gagal, kirim pesan error kembali
+            $this->session->set_flashdata('error_keperluan', validation_errors());
+        } else {
+            // Jika validasi berhasil, siapkan data untuk disimpan
+            $nama_keperluan_baru = $this->input->post('nama_keperluan');
+            
+            $data = [
+                'nama_keperluan' => $nama_keperluan_baru,
+                'is_active'      => 1 // Keperluan baru langsung diaktifkan
+                // Kolom 'template_file' akan otomatis NULL karena tidak kita sertakan
+            ];
+
+            // Simpan data ke database
+            $this->db->insert('tbkeperluansurat', $data);
+
+            // Kirim pesan sukses
+            $this->session->set_flashdata('pesan', 'Tipe keperluan baru "' . $nama_keperluan_baru . '" berhasil ditambahkan!');
+        }
+
+        // Kembalikan pengguna ke halaman formulir utama
+        redirect('surat_kedatangan');
+    }
+
+    /**
      * Fungsi untuk mencetak surat domisili berdasarkan ID Pengajuan.
      * Kode ini telah diperbarui untuk mengambil nama keperluan secara dinamis.
      */

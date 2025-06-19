@@ -120,7 +120,7 @@
         <div class="kop-teks">
             <h3 class="text-bold">PEMERINTAH KABUPATEN BADUNG</h3>
             <h3 class="text-bold">KECAMATAN KUTA SELATAN</h3>
-            <h2 class="text-bold">DESA JIMBARAN</h2>
+            <h3 class="text-bold">DESA JIMBARAN</h3>
             <p class="alamat-kop">Jl. Bukit Hijau No. 5, Jimbaran, Kuta Selatan 80361</p>
         </div>
     </div>

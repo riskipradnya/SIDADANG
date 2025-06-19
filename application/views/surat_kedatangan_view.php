@@ -1,39 +1,40 @@
 <div class="card shadow-sm" id="form-surat-edge-to-edge">
-    <div class="card-header card-header-minimalist"> Formulir Pengajuan Surat Pengantar
+    <div class="card-header card-header-minimalist"> 
+        Formulir Pengajuan Surat Pengantar
+
+        <a href="#" class="float-end" data-bs-toggle="modal" data-bs-target="#modalTambahKeperluan">
+            Tambah Tipe Keperluan ?
+        </a>
     </div>
 
-        <?php
-            // Ambil flashdata dari session
-            $pesan_sukses = $this->session->flashdata('pesan');
-            $pesan_error = $this->session->flashdata('error');
-            
-            // Tampilkan pesan sukses jika ada
-            if (!empty($pesan_sukses)) {
-                echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-                        ' . $pesan_sukses . '
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>';
-            }
-
-            // Tampilkan pesan error jika ada (untuk jaga-jaga ke depan)
-            if (!empty($pesan_error)) {
-                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        ' . $pesan_error . '
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>';
-            }
-        ?>
-    
     <div class="card-body">
 
-        <?php 
-        // Menampilkan pesan error jika ada dari controller
-        if ($this->session->flashdata('error')) {
-            echo '<div class="alert alert-danger" role="alert">' . $this->session->flashdata('error') . '</div>';
-        }
+        <?php
+            // Menampilkan pesan SUKSES dari proses apapun (termasuk dari modal)
+            if ($this->session->flashdata('pesan')) {
+                echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
+                        ' . $this->session->flashdata('pesan') . '
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>';
+            }
+
+            // Menampilkan pesan ERROR umum
+            if ($this->session->flashdata('error')) {
+                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        ' . $this->session->flashdata('error') . '
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>';
+            }
+            
+            // [2] BLOK KHUSUS UNTUK MENAMPILKAN PESAN ERROR DARI VALIDASI MODAL
+            if ($this->session->flashdata('error_keperluan')) {
+                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Gagal Menambahkan!</strong> ' . $this->session->flashdata('error_keperluan') . '
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>';
+            }
         ?>
-
-
+        
         <form action="<?= site_url('surat_kedatangan/proses_pengajuan'); ?>" method="POST" id="formPengajuanSurat">
 
             <div class="mb-4">
@@ -74,7 +75,6 @@
                 <input type="text" class="form-control" name="keperluan_lainnya_text" id="keperluan_lainnya_text" placeholder="Contoh: Pengantar SKCK">
             </div>
 
-
             <div class="text-center border-top pt-3 mt-3">
                 <button type="submit" class="btn btn-primary">
                     <i class="mdi mdi-send" style="transform: rotate(-45deg); display: inline-block;"></i> Ajukan Surat
@@ -85,6 +85,37 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="modalTambahKeperluan" tabindex="-1" aria-labelledby="modalTambahKeperluanLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <form action="<?= site_url('surat_kedatangan/tambah_keperluan'); ?>" method="POST">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTambahKeperluanLabel">Tambah Tipe Keperluan Baru</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="nama_keperluan_input" class="form-label">Nama Keperluan</label>
+                <input type="text" class="form-control" id="nama_keperluan_input" name="nama_keperluan" />
+                <!-- placeholder="Contoh: Pengantar Nikah" required> -->
+                <small class="form-text text-muted">Pastikan nama keperluan belum ada dalam daftar.</small>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <style>
@@ -98,9 +129,7 @@
     }
 </style>
 
-
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     
@@ -114,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Ambil elemen-elemen yang dibutuhkan dari DOM
-    const keperluanSelect = document.getElementById('id_keperluan'); // Ganti ID
+    const keperluanSelect = document.getElementById('id_keperluan');
     const lainnyaDiv = document.getElementById('keperluan_lainnya_div');
     const lainnyaInput = document.getElementById('keperluan_lainnya_text');
 

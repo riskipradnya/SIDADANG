@@ -12,7 +12,7 @@
     }
     .preview-img-full {
         max-height: 250px; width: auto; display: block;
-        margin-left: auto; margin-right: auto; margin-bottom: 1rem;
+        margin-left: auto; margin-right: auto; margin-bottom: 1reyxjas 2390n=ol 6t5m;
         border: 1px solid #eee;
     }
     #map {
@@ -69,11 +69,13 @@
                  <h5 class="mb-3">Data Diri & Akun</h5>
                 
                 <?php
-                // PERUBAHAN 2: Array PHP diperbaiki dan field baru ditambahkan
+                // --- PERBAIKAN DI SINI ---
+                // Array PHP diperbaiki untuk menambahkan 'email' dengan benar
                 $fields_kiri = [
                     'no_kk'         => ['label' => 'No. Kartu Keluarga', 'type' => 'text', 'name' => 'no_kk', 'required' => true, 'pattern' => '\d{16}', 'title' => 'No. KK harus 16 digit angka'],
                     'nik'           => ['label' => 'NIK Kepala Keluarga', 'type' => 'text', 'name' => 'NIK', 'required' => true, 'pattern' => '\d{16}', 'title' => 'NIK harus 16 digit angka'],
                     'nama'          => ['label' => 'Nama Kepala Keluarga', 'type' => 'text', 'name' => 'Nama', 'required' => true],
+                    'email'         => ['label' => 'Email Aktif', 'type' => 'email', 'name' => 'Email', 'required' => true, 'placeholder' => 'contoh@email.com'],
                     'username'      => ['label' => 'Username', 'type' => 'text', 'name' => 'username', 'required' => true],
                     'password'      => ['label' => 'Password', 'type' => 'password', 'name' => 'Password', 'required' => true],
                     'no_hp'         => ['label' => 'No Handphone Aktif', 'type' => 'tel', 'name' => 'Telp', 'required' => true, 'placeholder' => '08xxxxxxxxxx'],
@@ -83,12 +85,12 @@
 
                 foreach ($fields_kiri as $id => $attr) {
                     echo '<div class="mb-3">';
-                    echo "<label for='{$id}' class='form-label'>{$attr['label']}" . ($attr['required'] ? ' <span class="text-danger">*</span>' : '') . "</label>";
+                    echo "<label for='{$id}' class='form-label'>{$attr['label']}" . (!empty($attr['required']) ? ' <span class="text-danger">*</span>' : '') . "</label>";
                     echo "<input type='{$attr['type']}' class='form-control' name='{$attr['name']}' id='{$id}' " 
                          . (isset($attr['pattern']) ? "pattern='{$attr['pattern']}' " : "") 
                          . (isset($attr['title']) ? "title='{$attr['title']}' " : "") 
                          . (isset($attr['placeholder']) ? "placeholder='{$attr['placeholder']}' " : "Masukkan {$attr['label']}") 
-                         . ($attr['required'] ? 'required' : '') . ">";
+                         . (!empty($attr['required']) ? 'required' : '') . ">";
                     echo '</div>';
                 }
                 ?>

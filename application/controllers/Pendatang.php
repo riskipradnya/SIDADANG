@@ -11,6 +11,9 @@ class Pendatang extends CI_Controller {
         }
         $this->load->library(['form_validation', 'session', 'upload']);
         $this->load->helper(['url', 'form', 'file']);
+
+        $this->load->model('validasi');
+        $this->validasi->validasiakun();
     }
 
     /**

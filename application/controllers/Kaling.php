@@ -19,12 +19,48 @@ class Kaling extends CI_Controller
         $this->load->view('admin_view', $data); // Layout utama
     }
 
+    // File: application/controllers/Kaling.php
+
     public function verifikasidata($kodeDaftar)
     {
+        // Langkah 1: Ambil data lengkap akun dari tbkaling berdasarkan kodeDaftar
+        $akun = $this->db->get_where('tbkaling', ['kodeDaftar' => $kodeDaftar])->row();
+
+        // Jika akun tidak ditemukan, hentikan proses
+        if (!$akun) {
+            $this->session->set_flashdata('pesan', 'Gagal! Data akun tidak ditemukan.');
+            redirect('kaling', 'refresh'); // Sesuaikan dengan halaman admin Anda
+            return;
+        }
+
+        // Langkah 2: Ubah status aktivasi di tbkaling menjadi 'Terverifikasi'
         $this->db->where('kodeDaftar', $kodeDaftar);
         $this->db->update('tbkaling', ['statusAktivasi' => 'Terverifikasi']);
-        $this->session->set_flashdata('pesan', 'Akun berhasil diverifikasi!');
-        redirect('kaling', 'refresh');
+
+        // Langkah 3: Siapkan data untuk dimasukkan ke tblogin
+        // Pastikan nama kolom di tblogin (Level) sesuai dengan sumber data (jenisAkun)
+        $data_login = array(
+            'NIK'         => $akun->NIK,
+            'Password'    => $akun->password,      // Password diambil dari data asli
+            'NamaLengkap' => $akun->namaLengkap,
+            'Level'       => $akun->jenisAkun    // 'jenisAkun' dari tbkaling menjadi 'Level' di tblogin
+        );
+
+        // Langkah 4 (PENTING): Cek dulu apakah NIK sudah ada di tblogin sebelum insert
+        $cek_tblogin = $this->db->get_where('tblogin', ['NIK' => $akun->NIK])->num_rows();
+
+        if ($cek_tblogin == 0) {
+            // Jika NIK belum ada, masukkan data baru ke tblogin
+            $this->db->insert('tblogin', $data_login);
+        } else {
+            // Jika NIK sudah ada (misal karena verifikasi ulang), cukup update datanya
+            $this->db->where('NIK', $akun->NIK);
+            $this->db->update('tblogin', $data_login);
+        }
+
+        // Langkah 5: Beri pesan sukses
+        $this->session->set_flashdata('pesan', 'Akun berhasil diverifikasi dan siap untuk login!');
+        redirect('kaling', 'refresh'); // Sesuaikan dengan halaman admin Anda
     }
 
 

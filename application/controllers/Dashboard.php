@@ -1,6 +1,12 @@
 <?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
 class Dashboard extends CI_Controller
 {
+    /**
+     * Konstruktor ini sekarang hanya memeriksa apakah pengguna sudah login.
+     * Pengecekan level ('Admin', 'KALING', 'PJ') dihapus dari sini.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -9,48 +15,51 @@ class Dashboard extends CI_Controller
             $this->session->set_flashdata('pesan', 'Silakan login terlebih dahulu.');
             redirect('Halaman');
         }
-        if ($this->session->userdata('Level') !== 'Admin') {
-            $this->session->set_flashdata('pesan', 'Anda tidak memiliki akses sebagai admin.');
-            redirect('Halaman');
-        }
+
+        // Pastikan database selalu di-load
         if (!isset($this->db)) {
             $this->load->database();
         }
-        log_message('debug', 'User Level: ' . $this->session->userdata('Level'));
     }
 
-    public function admin()
+    /**
+     * Fungsi index() ini sekarang menjadi pintu masuk utama untuk SEMUA level.
+     * Ia akan mengumpulkan data dan menampilkan view dashboard yang sama untuk semua.
+     */
+    public function index()
     {
         $view_data = []; // Data yang akan dikirim ke view konten dashboard
 
-        // 1. Hitung jumlah data TERVERIFIKASI (sudah ada)
-        $this->db->where('statusAktivasi', 'Terverifikasi');
-        $view_data['jumlah_pendatang_terverifikasi'] = $this->db->count_all_results('tbpendatang');
+        // 1. Hitung jumlah data TERVERIFIKASI
+        $view_data['jumlah_pj_terverifikasi'] = $this->db->where('statusAktivasi', 'Terverifikasi')->count_all_results('tbpj');
+        $view_data['jumlah_kaling_terverifikasi'] = $this->db->where('statusAktivasi', 'Terverifikasi')->count_all_results('tbkaling');
+        $view_data['jumlah_pendatang_terverifikasi'] = $this->db->where('statusAktivasi', 'Terverifikasi')->count_all_results('tbpendatang');
 
-        $this->db->where('statusAktivasi', 'Terverifikasi');
-        $view_data['jumlah_pj_terverifikasi'] = $this->db->count_all_results('tbpj');
-
-        $this->db->where('statusAktivasi', 'Terverifikasi');
-        $view_data['jumlah_kaling_terverifikasi'] = $this->db->count_all_results('tbkaling');
-
-        // 2. Hitung jumlah data BELUM TERVERIFIKASI (BARU)
-        $this->db->where('statusAktivasi', 'Belum Terverifikasi');
-        $view_data['jumlah_pendatang_belum_verif'] = $this->db->count_all_results('tbpendatang');
-
-        $this->db->where('statusAktivasi', 'Belum'); // Sesuaikan jika statusnya 'Belum Terverifikasi'
-        $view_data['jumlah_pj_belum_verif'] = $this->db->count_all_results('tbpj');
-
-        $this->db->where('statusAktivasi', 'Belum'); // Sesuaikan jika statusnya 'Belum Terverifikasi'
-        $view_data['jumlah_kaling_belum_verif'] = $this->db->count_all_results('tbkaling');
+        // 2. Hitung jumlah data BELUM TERVERIFIKASI
+        $view_data['jumlah_pj_belum_verif'] = $this->db->where('statusAktivasi', 'Belum')->count_all_results('tbpj');
+        $view_data['jumlah_kaling_belum_verif'] = $this->db->where('statusAktivasi', 'Belum')->count_all_results('tbkaling');
+        $view_data['jumlah_pendatang_belum_verif'] = $this->db->where('statusAktivasi', 'Belum')->count_all_results('tbpendatang');
         
-        // Siapkan data untuk dikirim ke template utama admin_view.php
+        // 3. Siapkan data untuk dikirim ke template utama
         $template_data = [];
-        $template_data['title'] = 'Dashboard Admin';
+        $template_data['title'] = 'Dashboard SIDADANG';
+        // Semua level akan me-load view konten yang sama yaitu 'dashboard_utama_view'
         $template_data['konten'] = $this->load->view('dashboard_utama_view', $view_data, TRUE); 
-                                        // Ganti 'dashboard_utama_view' jika nama file Anda berbeda
 
+        // Semua level akan me-load template/kerangka halaman yang sama yaitu 'admin_view'
         $this->load->view('admin_view', $template_data);
     }
+    
+    /**
+     * Fungsi admin() yang lama tidak lagi diperlukan karena sudah digantikan oleh index().
+     * Jika Anda masih memiliki link yang mengarah ke /Dashboard/admin, Anda bisa membuat
+     * fungsi ini hanya untuk mengarahkan ke index().
+     */
+    public function admin()
+    {
+        redirect('Dashboard/index');
+    }
+
 
     public function logout()
     {
@@ -58,4 +67,3 @@ class Dashboard extends CI_Controller
         redirect('Halaman');
     }
 }
-?>

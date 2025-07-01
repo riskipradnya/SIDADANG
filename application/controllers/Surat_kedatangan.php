@@ -12,6 +12,9 @@ class Surat_kedatangan extends CI_Controller {
         $this->load->helper('url'); 
         $this->load->library(['session', 'form_validation']);
         $this->load->model('surat_model'); 
+
+        $this->load->model('validasi');
+        $this->validasi->validasiakun();
     }
 
     public function index()

@@ -33,12 +33,38 @@ class Pj extends CI_Controller
     /**
      * Mengubah status aktivasi PJ menjadi "Terverifikasi".
      */
-    public function verifikasidata($kodeDaftar)
+    // File: application/controllers/Pj.php (atau yang sejenis)
+
+    public function verifikasidata_pj($kodeDaftar)
     {
+        // Ambil data dari 'tbpj'
+        $akun = $this->db->get_where('tbpj', ['kodeDaftar' => $kodeDaftar])->row();
+
+        if (!$akun) { /* ... handle error ... */ }
+
+        // Update status di 'tbpj'
         $this->db->where('kodeDaftar', $kodeDaftar);
         $this->db->update('tbpj', ['statusAktivasi' => 'Terverifikasi']);
-        $this->session->set_flashdata('pesan', 'Akun berhasil diverifikasi!');
-        redirect('pj', 'refresh');
+
+        // Siapkan data login (sama persis)
+        $data_login = array(
+            'NIK'         => $akun->NIK,
+            'Password'    => $akun->password,
+            'NamaLengkap' => $akun->namaLengkap,
+            'Level'       => $akun->jenisAkun
+        );
+
+        // Cek dan Insert/Update ke tblogin (sama persis)
+        $cek_tblogin = $this->db->get_where('tblogin', ['NIK' => $akun->NIK])->num_rows();
+        if ($cek_tblogin == 0) {
+            $this->db->insert('tblogin', $data_login);
+        } else {
+            $this->db->where('NIK', $akun->NIK);
+            $this->db->update('tblogin', $data_login);
+        }
+
+        $this->session->set_flashdata('pesan', 'Akun PJ berhasil diverifikasi!');
+        redirect('pj', 'refresh'); // Arahkan ke halaman admin PJ
     }
 
     /**

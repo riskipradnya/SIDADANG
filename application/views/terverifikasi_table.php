@@ -46,12 +46,20 @@
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
 
-                                        <a href="<?= site_url('surat_kedatangan/hapus_pengajuan/' . $pengajuan->id); ?>" 
-                                           class="btn btn-outline-danger" 
-                                           title="Hapus Data" 
-                                           onclick="return confirm('PERINGATAN! Anda yakin ingin MENGHAPUS data ini?');">
-                                           <i class="mdi mdi-delete-outline"></i>
-                                        </a>
+                                        <?php
+                                        // Ambil level pengguna dari session
+                                        $level = $this->session->userdata('Level');
+
+                                        // Tampilkan tombol Hapus HANYA jika level adalah Admin atau KALING
+                                        if ($level == 'Admin' || $level == 'KALING'):
+                                        ?>
+                                            <a href="<?= site_url('surat_kedatangan/hapus_pengajuan/' . $pengajuan->id); ?>" 
+                                                class="btn btn-outline-danger" 
+                                                title="Hapus Data" 
+                                                onclick="return confirm('PERINGATAN! Anda yakin ingin MENGHAPUS data ini?');">
+                                                <i class="mdi mdi-delete-outline"></i>
+                                            </a>
+                                        <?php endif; ?>
 
                                         <a href="<?= site_url('surat_kedatangan/cetak_surat/' . $pengajuan->id); ?>" 
                                            class="btn btn-outline-primary" 

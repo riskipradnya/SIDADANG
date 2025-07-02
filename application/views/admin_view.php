@@ -71,21 +71,21 @@
           </ul>
           <ul class="navbar-nav ms-auto">
             
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <form class="search-form" action="#">
                 <i class="icon-search"></i>
                 <input type="search" class="form-control" placeholder="Search Here" title="Search here">
               </form>
-            </li>
+            </li> -->
             
-            <!--<li class="nav-item dropdown">
+            <li class="nav-item dropdown">
              
              </li>
             <li class="nav-item dropdown">
               <a class="nav-link count-indicator" id="countDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="mdi mdi-bell"></i>
               </a> 
-              <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="countDropdown">
+              <!-- <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="countDropdown">
                 <a class="dropdown-item py-3">
                   <p class="mb-0 fw-medium float-start">You have 7 unread mails </p>
                   <span class="badge badge-pill badge-primary float-end">View all</span>
@@ -118,8 +118,8 @@
                     <p class="fw-light small-text mb-0"> The reservasi is cancelled </p>
                   </div>
                 </a>
-              </div>
-            </li> -->
+              </div> -->
+            </li>
             <li class="nav-item dropdown d-none d-lg-block user-dropdown">
               <a class="nav-link mdi mdi-account-circle text-center " id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 24px; ">
                 <!-- <img class="img-xs rounded-circle mdi mdi-account-circle"> </a> -->
@@ -153,6 +153,17 @@
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
           <ul class="nav">
             <li class="nav-item">
+              <?php
+                  $Level = $this->session->userdata('Level');
+
+                  if ($Level == 'Admin') {
+                    
+                  } elseif ($Level == 'KALING') {
+
+                  } elseif ($Level == 'PJ') {
+
+                  }
+              ?>
               <a class="nav-link" href="<?php echo base_url('Dashboard/admin'); ?>">
                 <i class="mdi mdi-grid-large menu-icon"></i>
                 <span class="menu-title">Dashboard</span>
@@ -160,26 +171,30 @@
             </li>
             <li class="nav-item nav-category">Master Data</li>
 
-          
+            <!--filtering admin -->
+              <?php
+							if($Level=="Admin")
+							{
+							?>
+                            
                 <li class="nav-item">
                   <a class="nav-link" href="<?php echo base_url('Kaling'); ?>">
                     <i class="menu-icon mdi mdi-home-account"></i>
                     <span class="menu-title">Data KALING</span>
                   </a>
-                </li>
+                </li>         
+                            
+              <?php
+							}
+							?>
+            <!--end filtering admin -->
 
-              
+            <!--filtering kaling-->
 
-               
-           
             <?php
-	            // $Level=$this->session->userdata('Level');
-	            // if($Level=="Admin")
-	            // {
-                    
-            ?>
-              
-            <!-- end session -->
+						if($Level == "Admin" || $Level == "KALING")
+							{
+						?>
 
                 <li class="nav-item">
                   <a class="nav-link" href="<?php echo base_url('Pj'); ?>">
@@ -187,7 +202,11 @@
                     <span class="menu-title">Data PJ</span>
                   </a>
                 </li>
-        
+
+            <?php
+							}
+						?>
+            <!--end filtering kaling-->
 
                 <!-- <li class="nav-item">
                   <a class="nav-link" href="<?php echo base_url('Pendatang'); ?>">

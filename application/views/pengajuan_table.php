@@ -107,7 +107,11 @@
                                     <div class="btn-group btn-group-sm btn-group-aksi-responsive" role="group" aria-label="Aksi Pengajuan">
                                         <?php
                                             // Aksi yang hanya bisa dilakukan jika status masih 'Menunggu Verifikasi'
-                                            if ($pengajuan->status == 'Menunggu Verifikasi'):
+                                                // Ambil level pengguna dari session
+                                            $level = $this->session->userdata('Level');
+
+                                            // Cek status DAN level pengguna
+                                            if ($pengajuan->status == 'Menunggu Verifikasi' && ($level == 'Admin' || $level == 'KALING')):
                                         ?>
                                             <a href="<?= site_url('surat_kedatangan/verifikasi_pengajuan/' . $pengajuan->id); ?>" 
                                             class="btn btn-outline-success" 

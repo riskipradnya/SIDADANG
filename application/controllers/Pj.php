@@ -35,7 +35,7 @@ class Pj extends CI_Controller
      */
     // File: application/controllers/Pj.php (atau yang sejenis)
 
-    public function verifikasidata_pj($kodeDaftar)
+    public function verifikasidata($kodeDaftar)
     {
         // Ambil data dari 'tbpj'
         $akun = $this->db->get_where('tbpj', ['kodeDaftar' => $kodeDaftar])->row();

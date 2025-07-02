@@ -101,5 +101,24 @@ class Dashboard extends CI_Controller
 
 <!-- END DASHBOARD -->
 
-	
-	
+pendatang function daftar controler
+    public function daftar()
+    {
+        $this->db->select('
+            tp.*, 
+            pj.namaLengkap as pj_nama_lengkap, 
+            pj.NIK as pj_nik,
+            kl.namaLengkap as kaling_nama_lengkap,
+            kl.NIK as kaling_nik
+        ');
+        $this->db->from('tbpendatang tp');
+        $this->db->join('tbpj pj', 'pj.kodeDaftar = tp.id_penanggung_jawab', 'left');
+        $this->db->join('tbkaling kl', 'kl.kodeDaftar = tp.id_kepala_lingkungan', 'left');
+        $this->db->order_by('tp.id', 'DESC');
+        
+        $hasil_query = $this->db->get();
+        $data['pendatang_data'] = $hasil_query->result();
+
+        $data['konten'] = $this->load->view('pendatang_table', $data, TRUE);
+        $this->load->view('admin_view', $data);
+    }

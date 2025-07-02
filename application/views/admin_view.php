@@ -151,94 +151,75 @@
       <div class="container-fluid page-body-wrapper">
         <!-- partial:partials/_sidebar.html -->
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
-          <ul class="nav">
-            <li class="nav-item">
-              <?php
-                  $Level = $this->session->userdata('Level');
+        <ul class="nav">
+            <?php
+                // Ambil nama controller dari URL, ubah ke huruf kecil untuk konsistensi
+                $controller = strtolower($this->uri->segment(1));
+                // Ambil level pengguna dari session
+                $Level = $this->session->userdata('Level');
+            ?>
 
-                  if ($Level == 'Admin') {
-                    
-                  } elseif ($Level == 'KALING') {
-
-                  } elseif ($Level == 'PJ') {
-
-                  }
-              ?>
-              <a class="nav-link" href="<?php echo base_url('Dashboard/admin'); ?>">
-                <i class="mdi mdi-grid-large menu-icon"></i>
-                <span class="menu-title">Dashboard</span>
-              </a>
+            <li class="nav-item <?= ($controller == 'dashboard') ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= site_url('Dashboard'); ?>">
+                    <i class="mdi mdi-grid-large menu-icon"></i>
+                    <span class="menu-title">Dashboard</span>
+                </a>
             </li>
+            
             <li class="nav-item nav-category">Master Data</li>
 
-            <!--filtering admin -->
-              <?php
-							if($Level=="Admin")
-							{
-							?>
-                            
-                <li class="nav-item">
-                  <a class="nav-link" href="<?php echo base_url('Kaling'); ?>">
-                    <i class="menu-icon mdi mdi-home-account"></i>
-                    <span class="menu-title">Data KALING</span>
-                  </a>
-                </li>         
-                            
-              <?php
-							}
-							?>
-            <!--end filtering admin -->
-
-            <!--filtering kaling-->
-
-            <?php
-						if($Level == "Admin" || $Level == "KALING")
-							{
-						?>
-
-                <li class="nav-item">
-                  <a class="nav-link" href="<?php echo base_url('Pj'); ?>">
-                    <i class="menu-icon mdi mdi-account-supervisor"></i>
-                    <span class="menu-title">Data PJ</span>
-                  </a>
+            <?php if ($Level == "Admin"): ?>
+                <li class="nav-item <?= ($controller == 'kaling') ? 'active' : '' ?>">
+                    <a class="nav-link" href="<?= site_url('Kaling'); ?>">
+                        <i class="menu-icon mdi mdi-home-account"></i>
+                        <span class="menu-title">Data KALING</span>
+                    </a>
                 </li>
+            <?php endif; ?>
 
-            <?php
-							}
-						?>
-            <!--end filtering kaling-->
+            <?php if ($Level == "Admin" || $Level == "KALING"): ?>
+                <li class="nav-item <?= ($controller == 'pj') ? 'active' : '' ?>">
+                    <a class="nav-link" href="<?= site_url('Pj'); ?>">
+                        <i class="menu-icon mdi mdi-account-supervisor"></i>
+                        <span class="menu-title">Data PJ</span>
+                    </a>
+                </li>
+            <?php endif; ?>
 
-                <!-- <li class="nav-item">
-                  <a class="nav-link" href="<?php echo base_url('Pendatang'); ?>">
-                    <i class="menu-icon mdi mdi-card-account-details-outline"></i>
-                    <span class="menu-title">Pendatang</span>
-                  </a>
-                </li> -->
-
-              <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#submenuPendatang" aria-expanded="false" aria-controls="submenuPendatang">
+            <li class="nav-item <?= ($controller == 'pendatang') ? 'active' : '' ?>">
+                <a class="nav-link" data-bs-toggle="collapse" href="#submenuPendatang" aria-expanded="<?= ($controller == 'pendatang') ? 'true' : 'false' ?>" aria-controls="submenuPendatang">
                     <i class="menu-icon mdi mdi-book-open-page-variant-outline"></i>
                     <span class="menu-title">Data Pendatang</span>
                     <i class="menu-arrow"></i>
                 </a>
-                <div class="collapse" id="submenuPendatang">  <ul class="nav flex-column sub-menu">
-                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('Pendatang'); ?>">Form Pendatang</a></li>
-                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('pendatang/daftar'); ?>">Data Pendatang</a></li>
+                <div class="collapse <?= ($controller == 'pendatang') ? 'show' : '' ?>" id="submenuPendatang">
+                    <ul class="nav flex-column sub-menu">
+                        <li class="nav-item"> <a class="nav-link" href="<?= site_url('Pendatang'); ?>">Form Pendatang</a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?= site_url('pendatang/daftar'); ?>">Data Pendatang</a></li>
                     </ul>
                 </div>
             </li>
 
             <li class="nav-item nav-category">Document</li>
 
-            <li class="nav-item">
-              <a class="nav-link" href="<?= site_url('surat_kedatangan'); ?>">
-                <i class="menu-icon mdi mdi-file-document-multiple-outline"></i>
-                <span class="menu-title">Surat Pengantar</span>
-              </a>
+            <li class="nav-item <?= ($controller == 'surat_kedatangan') ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= site_url('surat_kedatangan'); ?>">
+                    <i class="menu-icon mdi mdi-file-document-multiple-outline"></i>
+                    <span class="menu-title">Surat Pengantar</span>
+                </a>
             </li>
             
-          </ul>
-        </nav>
+            <?php if ($Level == "Admin" || $Level == "KALING"): ?>
+            <li class="nav-item <?= ($controller == 'laporan') ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= site_url('laporan'); ?>">
+                    <i class="menu-icon mdi mdi-clipboard-file-outline"></i>
+                    <span class="menu-title">Laporan</span>
+                </a>
+            </li>
+            <?php endif; ?>
+            
+        </ul>
+    </nav>
         <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">

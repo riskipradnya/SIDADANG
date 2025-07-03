@@ -85,6 +85,7 @@ class Register extends CI_Controller {
                     'telp'           => $this->input->post('nomerTelepon'),
                     'email'          => $this->input->post('email'),
                     'jenisAkun'      => $jabatan,
+                    'id_kepala_lingkungan'  => 18, // <-- ID KEPALA LINGKUNGAN DEFAULT DITAMBAHKAN DI SINI
                     'password'       => $this->buatpwd(),
                     'statusAktivasi' => 'Belum'
                     // Kolom lain seperti no_kk, tempat_lahir, dll. akan otomatis NULL

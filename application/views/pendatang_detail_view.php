@@ -50,11 +50,11 @@
             <h5 class="mb-0"> 
                 <i class="mdi mdi-account-details"></i> Detail Data Pendatang: <?= htmlspecialchars($pendatang->nama); ?>
             </h5>
-            <?php if ($pendatang->statusAktivasi == 'Terverifikasi'): ?>
+            <!-- <?php if ($pendatang->statusAktivasi == 'Terverifikasi'): ?>
                 <a href="<?= site_url('pendatang/cetak_surat_domisili/' . $pendatang->id); ?>" class="btn btn-outline-dark btn-sm" title="Cetak Surat Keterangan Domisili" target="_blank">
                     <i class="mdi mdi-printer"></i> Cetak Surat Domisili
                 </a>
-            <?php endif; ?>
+            <?php endif; ?> -->
         </div>
         <div class="card-body">
             <div class="row mb-4">

@@ -63,7 +63,17 @@
                             <?php echo form_error('email', '<small class="text-danger">', '</small>'); ?>
                         </div>
 
+                        <div class="form-outline mb-4" data-mdb-input-init>
+                            <input class="form-control" id="password" name="password" type="password" placeholder="Password" />
+                            <label class="form-label" for="password">Password</label>
+                            <?php echo form_error('password', '<small class="text-danger">', '</small>'); ?>
+                        </div>
 
+                        <div class="form-outline mb-4" data-mdb-input-init>
+                            <input class="form-control" id="confirm_password" name="confirm_password" type="password" placeholder="Konfirmasi Password" />
+                            <label class="form-label" for="confirm_password">Konfirmasi Password</label>
+                            <?php echo form_error('confirm_password', '<small class="text-danger">', '</small>'); ?>
+                        </div>
 
                         <!-- Submit button -->
                         <div class="text-center">

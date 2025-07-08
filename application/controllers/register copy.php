@@ -16,14 +16,11 @@ class Register extends CI_Controller {
         $this->load->view('halamanRegister'); 
     }
 
-    // Fungsi buatpwd() sudah tidak diperlukan lagi dan bisa dihapus.
-    /*
     private function buatpwd()
     {
         $kata = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
         return substr(str_shuffle($kata), 0, 6);
     }
-    */
 
     public function register()
     {
@@ -33,16 +30,8 @@ class Register extends CI_Controller {
         $this->form_validation->set_rules('nomerTelepon', 'Nomor Telepon', 'required');
         $this->form_validation->set_rules('jabatan', 'Jabatan', 'required');
         $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
-        
 
-        if ($this->input->post('jabatan') === 'PJ') {
-        $this->form_validation->set_rules('alamat', 'Alamat', 'required');
-        }
-        
-        // Aturan validasi BARU untuk password
-        $this->form_validation->set_rules('password', 'Password', 'required|min_length[6]');
-        $this->form_validation->set_rules('confirm_password', 'Konfirmasi Password', 'required|matches[password]');
-
+        // Alamat hanya wajib jika jabatan adalah PJ
         if ($this->input->post('jabatan') === 'PJ') {
             $this->form_validation->set_rules('alamat', 'Alamat', 'required');
         }
@@ -51,53 +40,69 @@ class Register extends CI_Controller {
         if ($this->form_validation->run() == FALSE) {
             $this->load->view('halamanRegister');
         } else {
+            // Ambil data jabatan dan NIK dari form
             $jabatan = $this->input->post('jabatan');
             $nik = $this->input->post('nik');
 
-            // Ambil password dari input form, BUKAN dari buatpwd()
-            $password_input = $this->input->post('password');
-
             // 3. LOGIKA UTAMA BERDASARKAN JABATAN
             if ($jabatan == 'KALING') {
+                // Cek duplikasi NIK di tbkaling
                 $check = $this->db->get_where('tbkaling', ['NIK' => $nik])->row();
-                if ($check) { /* ... (logika error NIK duplikat) ... */ return; }
+                if ($check) {
+                    $this->session->set_flashdata('pesan', 'NIK sudah terdaftar sebagai Kepala Lingkungan.');
+                    $this->session->set_flashdata('alert_type', 'danger');
+                    redirect('register');
+                    return;
+                }
 
+                // Siapkan data untuk tbkaling
                 $data_kaling = array(
                     'NIK'            => $nik,
                     'namaLengkap'    => $this->input->post('namaLengkap'),
                     'email'          => $this->input->post('email'),
                     'telp'           => $this->input->post('nomerTelepon'),
                     'jenisAkun'      => $jabatan,
-                    'password'       => $password_input, // <-- DIGANTI
+                    'password'       => $this->buatpwd(),
                     'statusAktivasi' => 'Belum'
                 );
                 $this->db->insert('tbkaling', $data_kaling);
 
             } elseif ($jabatan == 'PJ') {
+                // Cek duplikasi NIK di tbpj
                 $check = $this->db->get_where('tbpj', ['NIK' => $nik])->row();
-                if ($check) { /* ... (logika error NIK duplikat) ... */ return; }
-                
+                if ($check) {
+                    $this->session->set_flashdata('pesan', 'NIK sudah terdaftar sebagai Penanggung Jawab.');
+                    $this->session->set_flashdata('alert_type', 'danger');
+                    redirect('register');
+                    return;
+                }
+
+                // Siapkan data untuk tbpj (sesuai kolom yang ada di form)
                 $data_pj = array(
-                    'NIK'                   => $nik,
-                    'namaLengkap'           => $this->input->post('namaLengkap'),
-                    'alamat'                => $this->input->post('alamat'),
-                    'telp'                  => $this->input->post('nomerTelepon'),
-                    'email'                 => $this->input->post('email'),
-                    'jenisAkun'             => $jabatan,
-                    'id_kepala_lingkungan'  => 18, 
-                    'password'              => $password_input, // <-- DIGANTI
-                    'statusAktivasi'        => 'Belum'
+                    'NIK'            => $nik,
+                    'namaLengkap'    => $this->input->post('namaLengkap'),
+                    'alamat'         => $this->input->post('alamat'),
+                    'telp'           => $this->input->post('nomerTelepon'),
+                    'email'          => $this->input->post('email'),
+                    'jenisAkun'      => $jabatan,
+                    'id_kepala_lingkungan'  => 18, // <-- ID KEPALA LINGKUNGAN DEFAULT DITAMBAHKAN DI SINI
+                    'password'       => $this->buatpwd(),
+                    'statusAktivasi' => 'Belum'
+                    // Kolom lain seperti no_kk, tempat_lahir, dll. akan otomatis NULL
+                    // karena tidak kita masukkan ke dalam array $data_pj
                 );
                 $this->db->insert('tbpj', $data_pj);
             }
 
             // 4. BERI FEEDBACK DAN REDIRECT
             if ($this->db->affected_rows() > 0) {
-                $this->session->set_flashdata('pesan', 'Registrasi berhasil! Silakan login.');
+                $this->session->set_flashdata('pesan', 'Registrasi berhasil! Akun Anda akan segera diverifikasi oleh Admin.');
                 $this->session->set_flashdata('alert_type', 'success');
-                redirect('Halaman');
+                redirect('Halaman'); // Redirect ke halaman login
             } else {
-                $this->session->set_flashdata('pesan', 'Registrasi gagal. Coba lagi.');
+                // Kondisi ini jarang terjadi jika validasi sudah lolos,
+                // tapi baik untuk penanganan error.
+                $this->session->set_flashdata('pesan', 'Registrasi gagal. Terjadi kesalahan pada server.');
                 $this->session->set_flashdata('alert_type', 'danger');
                 redirect('register');
             }

@@ -20,24 +20,29 @@
             padding-bottom: 10px; 
             margin-bottom: 20px; 
         }
-        .header h3 { 
-            margin: 0; 
-            font-size: 22px; 
-        }
-        .header p { 
-            margin: 5px 0; 
-            font-size: 14px; 
-        }
+        .header h3 { margin: 0; font-size: 22px; }
+        .header p { margin: 5px 0; font-size: 14px; }
+        
+        /* --- PERUBAHAN CSS INFO DI SINI --- */
         .info { 
             margin-bottom: 20px; 
         }
         .info table { 
-            width: 50%; 
+            width: auto; /* Dibuat auto agar lebarnya sesuai konten */
             border-collapse: collapse; 
         }
-        .info td { 
-            padding: 3px; 
+        .info .label-col {
+            width: 130px; /* Lebar tetap untuk kolom label */
         }
+        .info .separator-col {
+            width: 15px;  /* Lebar tetap untuk kolom titik dua */
+            text-align: center;
+        }
+        .info td { 
+            padding: 2px; /* Mengurangi padding agar lebih rapat */
+        }
+        /* --- SELESAI PERUBAHAN CSS --- */
+
         .report-table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -58,19 +63,17 @@
         .text-center {
             text-align: center;
         }
-        .footer { 
-            text-align: right; 
-            margin-top: 40px; 
-            font-size: 11px; 
-        }
-        .signature { 
-            margin-top: 50px; 
-            text-align: right;
+        .signature-section { 
+            margin-top: 40px;
             width: 250px;
             float: right;
+            text-align: center;
         }
-        .signature p {
-            margin-bottom: 60px;
+        .signature-section p {
+            margin-bottom: 0;
+        }
+        .signature-space {
+            height: 50px;
         }
     </style>
 </head>
@@ -84,18 +87,21 @@
         <div class="info">
             <table>
                 <tr>
-                    <td><strong>Periode</strong></td>
-                    <td>: <?= !empty($filter_info['bulan_tahun']) ? date('F Y', strtotime($filter_info['bulan_tahun'])) : 'Semua Data'; ?></td>
+                    <td class="label-col"><strong>Periode</strong></td>
+                    <td class="separator-col">:</td>
+                    <td><?= !empty($filter_info['bulan_tahun']) ? date('F Y', strtotime($filter_info['bulan_tahun'])) : 'Semua Data'; ?></td>
                 </tr>
                 <tr>
-                    <td><strong>Penanggung Jawab</strong></td>
-                    <td>: <?= htmlspecialchars($filter_info['nama_pj']); ?></td>
+                    <td class="label-col"><strong>Penanggung Jawab</strong></td>
+                    <td class="separator-col">:</td>
+                    <td><?= htmlspecialchars($filter_info['nama_pj']); ?></td>
                 </tr>
                  <tr>
-                    <td><strong>Tanggal Cetak</strong></td>
-                    <td>: <?= date('d F Y'); ?></td>
+                    <td class="label-col"><strong>Tanggal Cetak</strong></td>
+                    <td class="separator-col">:</td>
+                    <td><?= date('d F Y'); ?></td>
                 </tr>
-            </table>
+                </table>
         </div>
 
         <table class="report-table">
@@ -133,13 +139,11 @@
             </tbody>
         </table>
 
-        <div class="footer">
-            <div class="signature">
-                <p>Jimbaran, <?= date('d F Y'); ?></p>
-                
-                <p>(_________________________)</p>
-                <strong>Petugas / Admin</strong>
-            </div>
+        <div class="signature-section">
+            <p>Jimbaran, <?= date('d F Y'); ?></p>
+            <p>Petugas / Admin</p>
+            <div class="signature-space"></div>
+            <p><strong>(_________________________)</strong></p>
         </div>
     </div>
 </body>

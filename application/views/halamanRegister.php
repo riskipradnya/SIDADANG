@@ -63,18 +63,6 @@
                             <?php echo form_error('email', '<small class="text-danger">', '</small>'); ?>
                         </div>
 
-                        <div class="form-outline mb-4" data-mdb-input-init>
-                            <input class="form-control" id="password" name="password" type="password" placeholder="Password" />
-                            <label class="form-label" for="password">Password</label>
-                            <?php echo form_error('password', '<small class="text-danger">', '</small>'); ?>
-                        </div>
-
-                        <div class="form-outline mb-4" data-mdb-input-init>
-                            <input class="form-control" id="confirm_password" name="confirm_password" type="password" placeholder="Konfirmasi Password" />
-                            <label class="form-label" for="confirm_password">Konfirmasi Password</label>
-                            <?php echo form_error('confirm_password', '<small class="text-danger">', '</small>'); ?>
-                        </div>
-
                         <!-- Submit button -->
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary btn-block mb-4" data-mdb-button-init data-mdb-ripple-init onClick="prosesRegister();">
@@ -121,26 +109,6 @@
         if (jabatan == "") {
             alert("Jabatan harus dipilih");
             $('#jabatan').focus();
-            return false;
-        }
-
-        var password = $('#password').val();
-        if (password == "") {
-            alert("Password masih kosong");
-            $('#password').focus();
-            return false;
-        }
-
-        var confirmPassword = $('#confirm_password').val();
-        if (confirmPassword == "") {
-            alert("Konfirmasi Password masih kosong");
-            $('#confirm_password').focus();
-            return false;
-        }
-
-        if (password !== confirmPassword) {
-            alert("Password dan Konfirmasi Password tidak sesuai");
-            $('#confirm_password').focus();
             return false;
         }
 

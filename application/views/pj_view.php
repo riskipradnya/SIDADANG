@@ -115,13 +115,6 @@ function simpanpj() {
                 </div>
             </div>
 
-            <div class="row mb-3">
-                <label for="Password" class="col-sm-2 col-form-label">Password</label>
-                <div class="col-sm-10">
-                    <input type="password" name="Password" id="Password" class="form-control" required>
-                </div>
-            </div>
-
             <input type="hidden" name="jenisAkun" id="jenisAkun" value="PJ"/>
             <!-- <input type="hidden" name="password" id="password" />  -->
 

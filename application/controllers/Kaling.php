@@ -6,6 +6,10 @@ class Kaling extends CI_Controller
         parent::__construct();
         $this->load->model('validasi');
         $this->validasi->validasiakun(); // Validasi login
+
+        // Tambahkan baris ini
+        $this->load->helper(array('form', 'url', 'string'));
+        $this->load->library('email');
     }
 
     // Menampilkan form dan tabel
@@ -65,54 +69,64 @@ class Kaling extends CI_Controller
 
 
     // Simpan data baru atau edit
+    // Ganti dengan fungsi simpandata() yang baru ini
     public function simpandata()
     {
-        $kodeDaftar = $this->input->post('kodeDaftar'); // Hidden input
-        $NIK = $this->input->post('NIK');
-        $Password = $this->input->post('Password');
-        $NamaLengkap = $this->input->post('Nama');
-        $Telp = $this->input->post('Telp');
+        $kodeDaftar = $this->input->post('kodeDaftar');
         $Email = $this->input->post('Email');
-        $jenisAkun = $this->input->post('jenisAkun');
-        // Ambil data Alamat Rumah dari form
-        // Nama 'Alamat_Rumah' harus sama dengan atribut 'name' pada input/textarea di kaling_view.php
-        $AlamatRumah = $this->input->post('Alamat_Rumah');
 
         $data = array(
-            'NIK' => $NIK,
-            'Password' => $Password,
-            'NamaLengkap' => $NamaLengkap,
-            'Telp' => $Telp,
+            'NIK' => $this->input->post('NIK'),
+            'NamaLengkap' => $this->input->post('Nama'),
+            'Telp' => $this->input->post('Telp'),
             'Email' => $Email,
-            'Alamat_Rumah' => $AlamatRumah,
-            'jenisAkun' => $jenisAkun,
-            'statusAktivasi' => 'Belum' // Default status
+            'Alamat_Rumah' => $this->input->post('Alamat_Rumah'),
+            'jenisAkun' => $this->input->post('jenisAkun'),
         );
 
-        if ($kodeDaftar == "") {
-            // Cek duplikasi NIK sebelum insert (opsional tapi direkomendasikan)
-            // $cek_nik = $this->db->get_where('tbkaling', array('NIK' => $NIK))->num_rows();
-            // if ($cek_nik > 0) {
-            //     $this->session->set_flashdata('error', 'NIK sudah terdaftar!');
-            //     redirect('kaling', 'refresh');
-            //     return;
-            // }
+        if (empty($kodeDaftar)) { // HANYA saat membuat data baru
+            // 1. Buat password & token
+            $temporary_password = random_string('alnum', 8);
+            $reset_token = random_string('alnum', 32);
 
+            // 2. Tambahkan ke data
+            $data['password'] = $temporary_password;
+            $data['reset_token'] = $reset_token;
+            $data['statusAktivasi'] = 'Belum';
+
+            // 3. Simpan data ke DB
             $this->db->insert('tbkaling', $data);
-            $this->session->set_flashdata('pesan', 'Data sudah disimpan ...');
-        } else {
-            // Cek duplikasi NIK saat edit (opsional, pastikan NIK unik selain untuk dirinya sendiri)
-            // $cek_nik = $this->db->get_where('tbkaling', array('NIK' => $NIK, 'kodeDaftar !=' => $kodeDaftar))->num_rows();
-            // if ($cek_nik > 0) {
-            //     $this->session->set_flashdata('error', 'NIK sudah terdaftar untuk pengguna lain!');
-            //     redirect('kaling', 'refresh');
-            //     return;
-            // }
+
+            // 4. Kirim email
+            $this->_kirim_email_aktivasi($reset_token, $Email);
+
+            $this->session->set_flashdata('pesan', 'Data Kaling baru berhasil disimpan. Email aktivasi telah dikirim.');
+        } else { // Saat update data
+            // Hapus password dari array data agar tidak ter-update kosong
+            // jika kolom password tidak ada di form edit
+            unset($data['password']); 
+
             $this->db->where('kodeDaftar', $kodeDaftar);
             $this->db->update('tbkaling', $data);
-            $this->session->set_flashdata('pesan', 'Data sudah diedit ...');
+            $this->session->set_flashdata('pesan', 'Data Kaling sudah diedit.');
         }
         redirect('kaling', 'refresh');
+    }
+
+    // Tambahkan fungsi ini di dalam class Kaling
+    private function _kirim_email_aktivasi($token, $email)
+    {
+        $this->email->from($this->config->item('smtp_user'), 'Admin SIDADANG');
+        $this->email->to($email);
+        $this->email->subject('Aktivasi Akun dan Pengaturan Password SIDADANG');
+
+        $message  = "<h4>Akun Anda telah dibuat oleh Admin.</h4>";
+        $message .= "<p>Silakan klik tautan di bawah ini untuk mengatur password Anda:</p>";
+        $message .= "<h3><a href='" . site_url('auth/reset_password/' . $token) . "'>Atur Password Saya</a></h3>";
+        $message .= "<br><br><p>Jika Anda tidak merasa didaftarkan, abaikan email ini.</p>";
+
+        $this->email->message($message);
+        $this->email->send();
     }
 
 

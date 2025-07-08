@@ -9,7 +9,11 @@ class Pj extends CI_Controller
         parent::__construct();
         $this->load->model('validasi');
         $this->validasi->validasiakun(); // Validasi login
-        // Pastikan database di-load jika belum
+        
+        // Tambahkan baris ini untuk memuat helper & library yang dibutuhkan
+        $this->load->helper(array('form', 'url', 'string'));
+        $this->load->library('email');
+
         if (!isset($this->db)) {
             $this->load->database();
         }
@@ -138,6 +142,22 @@ class Pj extends CI_Controller
             return FALSE;
         }
         return TRUE;
+    }
+
+    // Tambahkan fungsi ini di dalam class Pj
+    private function _kirim_email_aktivasi($token, $email)
+    {
+        $this->email->from($this->config->item('smtp_user'), 'Admin SIDADANG');
+        $this->email->to($email);
+        $this->email->subject('Aktivasi Akun dan Pengaturan Password SIDADANG');
+
+        $message  = "<h4>Akun Anda telah dibuat oleh Admin.</h4>";
+        $message .= "<p>Silakan klik tautan di bawah ini untuk mengatur password Anda:</p>";
+        $message .= "<h3><a href='" . site_url('auth/reset_password/' . $token) . "'>Atur Password Saya</a></h3>";
+        $message .= "<br><br><p>Jika Anda tidak merasa didaftarkan, abaikan email ini.</p>";
+
+        $this->email->message($message);
+        $this->email->send();
     }
 
 

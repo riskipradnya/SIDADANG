@@ -108,13 +108,6 @@ function simpankaling() {
                     <input type="email" name="Email" id="Email_Kaling" class="form-control" required>
                 </div>
             </div>
-            
-            <div class="row mb-3">
-                <label for="Password_Kaling" class="col-sm-2 col-form-label">Password</label>
-                <div class="col-sm-10">
-                    <input type="Password" name="Password" id="Password_Kaling" class="form-control" required>
-                </div>
-            </div>
 
             <input type="hidden" name="jenisAkun" id="jenisAkun_Kaling" value="Kaling"/>
             <!-- <input type="hidden" name="password" id="password_Kaling" /> -->

@@ -28,6 +28,13 @@ class Dashboard extends CI_Controller
      */
     public function index()
     {
+
+        // --- TAMBAHKAN KODE INI UNTUK DEBUGGING ---
+        // echo "<pre>";
+        // print_r($this->session->all_userdata());
+        // echo "</pre>";
+        // die; 
+
         $view_data = []; // Data yang akan dikirim ke view konten dashboard
 
         // 1. Hitung jumlah data TERVERIFIKASI

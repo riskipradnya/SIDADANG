@@ -16,9 +16,10 @@ class Halaman extends CI_Controller
     }
 
     // Proses login
+    // Proses login
     public function proseslogin() {
         // Ambil data dari form
-        $nik = $this->input->post('nik', TRUE); // Ganti dari 'username' ke 'nik'
+        $nik = $this->input->post('nik', TRUE);
         $password = $this->input->post('password', TRUE);
 
         // Cek apakah NIK ada di database
@@ -27,18 +28,21 @@ class Halaman extends CI_Controller
         if ($query->num_rows() > 0) {
             $data = $query->row(); // Ambil data pengguna
             
-            // Cek apakah password cocok
-            if ($data->Password == $password) { // Pastikan nama kolom sesuai
-                // Simpan data ke session
+            // DIUBAH: Gunakan password_verify() untuk cek password yang sudah di-hash
+            if ($data->Password == $password) {
+                
+                // Simpan data ke session (Kode Anda di sini sudah benar)
                 $array = array(
                     'KodeLogin'   => $data->KodeLogin,
                     'NIK'         => $data->NIK,
                     'NamaLengkap' => $data->NamaLengkap,
-                    'Level'       => $data->Level
+                    'Level'       => $data->Level,
+                    'is_logged_in' => TRUE
                 );
 
                 $this->session->set_userdata($array);
                 redirect('Dashboard/admin'); // Arahkan ke dashboard admin
+
             } else {
                 $this->session->set_flashdata('pesan', 'Password salah!');
                 redirect('Halaman');

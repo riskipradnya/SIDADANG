@@ -240,6 +240,10 @@ class Pendatang extends CI_Controller {
      */
     public function daftar()
     {
+        // Ambil Level & NIK dari session
+        $level_user = $this->session->userdata('Level');
+        $nik_user = $this->session->userdata('NIK');
+
         $this->db->select('
             tp.*, 
             pj.namaLengkap as pj_nama_lengkap, 
@@ -250,6 +254,14 @@ class Pendatang extends CI_Controller {
         $this->db->from('tbpendatang tp');
         $this->db->join('tbpj pj', 'pj.kodeDaftar = tp.id_penanggung_jawab', 'left');
         $this->db->join('tbkaling kl', 'kl.kodeDaftar = tp.id_kepala_lingkungan', 'left');
+        
+        // --- LOGIKA FILTER BARU YANG DISEMPURNAKAN ---
+        if ($level_user == 'PJ') {
+            // Langsung filter query utama berdasarkan NIK milik PJ yang login.
+            // 'pj.NIK' digunakan untuk memberitahu database agar menggunakan NIK dari tabel tbpj.
+            $this->db->where('pj.NIK', $nik_user);
+        }
+
         $this->db->order_by('tp.id', 'DESC');
         
         $hasil_query = $this->db->get();
@@ -258,6 +270,7 @@ class Pendatang extends CI_Controller {
         $data['konten'] = $this->load->view('pendatang_table', $data, TRUE);
         $this->load->view('admin_view', $data);
     }
+
 
     /**
      * Menampilkan detail data pendatang.

@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
 <div class="container-fluid mt-4">
-    <!-- <h4 class="mb-4">Ringkasan Data Sistem</h4> -->
+    <?php if ($Level == "Admin"): ?>
     <div class="row">
         <div class="col-md-4 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
@@ -62,7 +62,10 @@
                 </div>
             </div>
         </div>
-    </div> <?php
+    </div>
+    <?php endif; ?>
+
+    <?php
         // Kumpulkan pesan untuk data yang belum terverifikasi dengan format baru
         $pesan_detail_belum_verifikasi = [];
         if (isset($jumlah_pendatang_belum_verif) && $jumlah_pendatang_belum_verif > 0) {
@@ -76,53 +79,52 @@
         }
     ?>
 
-    <?php if (!empty($pesan_detail_belum_verifikasi)): // Hanya tampilkan card jika ada data yang belum terverifikasi ?>
-    <div class="row mt-2"> 
-        <div class="col-md-12"> 
-            <div class="card border-left-warning shadow"> 
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="col-auto pe-3">
-                            <i class="mdi mdi-alert-outline text-warning" style="font-size: 2.8rem; line-height: 1;"></i> 
-                        </div>
-                        <div class="col">
-                            <div class="h6 mb-0 text-gray-800 text-uppercase">
-                                Perlu Verifikasi !!!
+    <?php if ($Level == "Admin"): ?>
+        <?php if (!empty($pesan_detail_belum_verifikasi)): // Hanya tampilkan card jika ada data yang belum terverifikasi ?>
+        <div class="row mt-2">
+            <div class="col-md-12">
+                <div class="card border-left-warning shadow">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="col-auto pe-3">
+                                <i class="mdi mdi-alert-outline text-warning" style="font-size: 2.8rem; line-height: 1;"></i>
                             </div>
-                            <div class="h6 mb-0 mt-1 text-gray-800 fw-normal"> 
-                                Ada data yang belum terverifikasi: <?= implode(', ', $pesan_detail_belum_verifikasi); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php else: // Jika semua sudah terverifikasi ?>
-    <div class="row mt-2">
-        <div class="col-md-12">
-            <div class="card border-left-success shadow"> 
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="col-auto pe-3">
-                            <i class="mdi mdi-check-all text-success" style="font-size: 2.8rem; line-height: 1;"></i>
-                        </div>
-                        <div class="col">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Status Verifikasi
-                            </div>
-                            <div class="h6 mb-0 font-weight-bold text-gray-800">
-                                Semua data penting telah terverifikasi.
+                            <div class="col">
+                                <div class="h6 mb-0 text-gray-800 text-uppercase">
+                                    Perlu Verifikasi !!!
+                                </div>
+                                <div class="h6 mb-0 mt-1 text-gray-800 fw-normal">
+                                    Ada data yang belum terverifikasi: <?= implode(', ', $pesan_detail_belum_verifikasi); ?>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <?php endif; ?>
+        <?php else: // Jika semua sudah terverifikasi ?>
+        <div class="row mt-2">
+            <div class="col-md-12">
+                <div class="card border-left-success shadow">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="col-auto pe-3">
+                                <i class="mdi mdi-check-all text-success" style="font-size: 2.8rem; line-height: 1;"></i>
+                            </div>
+                            <div class="col">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Status Verifikasi
+                                </div>
+                                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                                    Semua data penting telah terverifikasi.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+    <?php endif; // <-- Tutup kondisi di sini ?>
 
-    <!-- <div class="mt-4">
-        <p class="text-muted"><em>Dashboard terakhir diperbarui pada: <?= date('d F Y, H:i:s'); ?> WITA</em></p>
-    </div> -->
-</div>
+    </div>

@@ -2,7 +2,7 @@
 class Pj extends CI_Controller
 {
     // Asumsikan ID Kaling default adalah 1. Ganti angka 1 dengan ID Kaling default Anda.
-    const DEFAULT_KALING_ID = 14; // <<---- GANTI DENGAN ID KALING DEFAULT ANDA
+    const DEFAULT_KALING_ID = 18; // <<---- GANTI DENGAN ID KALING DEFAULT ANDA
 
     public function __construct()
     {

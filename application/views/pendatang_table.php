@@ -1,5 +1,7 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+
 <style>
-    /* ... (CSS Anda yang sudah ada tetap di sini) ... */
+    /* --- CSS LAMA ANDA (Dipertahankan) --- */
     .kolom-teks-panjang {
         word-wrap: break-word;
         white-space: normal !important; 
@@ -38,7 +40,7 @@
         #dataTablePendatang th,
         #dataTablePendatang td {
             padding: 0.5rem 0.4rem;
-            font-size: 0.85rem;  
+            font-size: 0.85rem;  
         }
         .btn-group-sm > .btn {
             padding: 0.2rem 0.4rem;
@@ -70,6 +72,10 @@
 <h3>Data Pendatang</h3>
 <p>Berikut adalah seluruh data pendatang yang telah terdaftar dalam sistem.</p>
 
+<div class="mb-3">
+    <input type="text" id="searchInput" class="form-control" placeholder="Cari berdasarkan Nama atau NIK...">
+</div>
+
 <div class="table-responsive">
     <table class="table table-bordered table-hover" id="dataTablePendatang">
         <thead>
@@ -88,6 +94,10 @@
         </thead>
         <tbody>
             <?php
+            // Pastikan $Level di sini sudah dikirim dari controller (seperti yang sudah kita bahas sebelumnya)
+            // Example: $data['Level'] = $this->session->userdata('Level'); in your controller
+            $user_level = $this->session->userdata('Level'); // Ambil level pengguna di sini
+            
             $colspan_minimal = 10; 
             if (empty($pendatang_data)) {
                 echo "<tr><td colspan='" . $colspan_minimal . "' class='text-center'>Belum ada data pendatang yang tersimpan.</td></tr>";
@@ -131,20 +141,22 @@
                             <i class="mdi mdi-eye-outline"></i>
                         </a>
                         
-                        <?php if ($data->statusAktivasi == 'Belum Terverifikasi'): ?>
-                            <a href="<?php echo site_url('pendatang/verifikasi/' . $data->id); ?>" class="btn btn-outline-success" title="Verifikasi Data" onclick="return confirm('Apakah Anda yakin ingin MEMVERIFIKASI data pendatang an. <?= htmlspecialchars(addslashes($data->nama)); ?>?')">
-                                <i class="mdi mdi-check-circle-outline"></i>
-                            </a>
-                            <button type="button" class="btn btn-outline-warning btn-tolak-verifikasi" 
-                                    data-bs-toggle="modal" data-bs-target="#modalTolakVerifikasi"
-                                    data-id="<?= $data->id; ?>"
-                                    data-nama="<?= htmlspecialchars($data->nama); ?>"
-                                    data-nik="<?= htmlspecialchars($data->nik); ?>"
-                                    data-tglmasuk="<?= (!empty($data->tgl_masuk) && $data->tgl_masuk != '0000-00-00') ? date('d F Y', strtotime($data->tgl_masuk)) : '-'; ?>"
-                                    title="Tolak Verifikasi">
-                                <i class="mdi mdi-close-circle-outline"></i>
-                            </button>
-                        <?php endif; ?>
+                        <?php if (isset($user_level) && ($user_level == 'Admin' || $user_level == 'KALING')): // <-- KONDISI BARU DI SINI ?>
+                            <?php if ($data->statusAktivasi == 'Belum Terverifikasi'): ?>
+                                <a href="<?php echo site_url('pendatang/verifikasi/' . $data->id); ?>" class="btn btn-outline-success" title="Verifikasi Data" onclick="return confirm('Apakah Anda yakin ingin MEMVERIFIKASI data pendatang an. <?= htmlspecialchars(addslashes($data->nama)); ?>?')">
+                                    <i class="mdi mdi-check-circle-outline"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-warning btn-tolak-verifikasi" 
+                                        data-bs-toggle="modal" data-bs-target="#modalTolakVerifikasi"
+                                        data-id="<?= $data->id; ?>"
+                                        data-nama="<?= htmlspecialchars($data->nama); ?>"
+                                        data-nik="<?= htmlspecialchars($data->nik); ?>"
+                                        data-tglmasuk="<?= (!empty($data->tgl_masuk) && $data->tgl_masuk != '0000-00-00') ? date('d F Y', strtotime($data->tgl_masuk)) : '-'; ?>"
+                                        title="Tolak Verifikasi">
+                                    <i class="mdi mdi-close-circle-outline"></i>
+                                </button>
+                            <?php endif; ?>
+                        <?php endif; // <-- PENUTUP KONDISI LEVEL ?>
 
                         <a href="<?php echo site_url('pendatang/hapus/' . $data->id); ?>" class="btn btn-outline-danger" title="Hapus Data" onclick="return confirm('Apakah Anda yakin ingin menghapus data an. <?= htmlspecialchars(addslashes($data->nama)); ?>?')">
                             <i class="mdi mdi-delete-outline"></i>
@@ -156,7 +168,7 @@
                 $no++;
                 endforeach;
             }
-            ?>
+            ?> 
         </tbody>
     </table>
 </div>
@@ -181,12 +193,12 @@
                             <tr>
                                 <td>NIK</td>
                                 <td>:</td>
-                                <td id="modalNikPendatang"></td>
+                                <td><span id="modalNikPendatang"></span></td>
                             </tr>
                             <tr>
                                 <td>Tanggal Masuk</td>
                                 <td>:</td>
-                                <td id="modalTglMasukPendatang"></td>
+                                <td><span id="modalTglMasukPendatang"></span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -211,8 +223,38 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // --- JavaScript untuk Fitur Pencarian ---
+    const searchInput = document.getElementById('searchInput');
+    const dataTable = document.getElementById('dataTablePendatang');
+    const tableRows = dataTable ? dataTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr') : [];
+
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const filter = searchInput.value.toLowerCase();
+
+            for (let i = 0; i < tableRows.length; i++) {
+                const row = tableRows[i];
+                // Mengambil teks dari kolom NIK (indeks 1) dan Nama Lengkap (indeks 2)
+                const nikCell = row.cells[1]; // Kolom NIK
+                const namaCell = row.cells[2]; // Kolom Nama Lengkap
+
+                if (nikCell && namaCell) {
+                    const nikText = nikCell.textContent || nikCell.innerText;
+                    const namaText = namaCell.textContent || namaCell.innerText;
+
+                    // Periksa apakah teks pencarian ada di NIK atau Nama Lengkap
+                    if (nikText.toLowerCase().indexOf(filter) > -1 || namaText.toLowerCase().indexOf(filter) > -1) {
+                        row.style.display = ""; // Tampilkan baris
+                    } else {
+                        row.style.display = "none"; // Sembunyikan baris
+                    }
+                }
+            }
+        });
+    }
+
+    // --- JavaScript untuk Modal Tolak Verifikasi (Kode lama Anda) ---
     var modalTolakVerifikasiElement = document.getElementById('modalTolakVerifikasi');
-    // Pastikan elemen modal ada sebelum mencoba membuat instance Bootstrap Modal
     if (modalTolakVerifikasiElement) {
         var modalTolakVerifikasi = new bootstrap.Modal(modalTolakVerifikasiElement);
     }
@@ -236,7 +278,6 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if(idPendatangTolakInput) idPendatangTolakInput.value = id;
             
-            // Set action form dengan benar
             if(formTolakVerifikasi) {
                 formTolakVerifikasi.action = "<?= site_url('pendatang/tolak_verifikasi_dengan_alasan/'); ?>" + id;
             }
@@ -247,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             if(alasanErrorDiv) alasanErrorDiv.style.display = 'none';
 
-            if(modalTolakVerifikasi) modalTolakVerifikasi.show(); // Tampilkan modal Bootstrap 5
+            if(modalTolakVerifikasi) modalTolakVerifikasi.show();
         });
     });
 
@@ -261,10 +302,6 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 alasanPenolakanTextarea.classList.remove('is-invalid');
                 if(alasanErrorDiv) alasanErrorDiv.style.display = 'none';
-                // Opsional: Tambahkan konfirmasi JavaScript sebelum submit jika diinginkan
-                // if(!confirm('Apakah Anda yakin ingin menolak verifikasi data ini dengan alasan yang telah diisi?')){
-                //     event.preventDefault();
-                // }
             }
         }, false);
     }
